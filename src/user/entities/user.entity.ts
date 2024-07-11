@@ -13,6 +13,8 @@ import { VerificationCode } from '../../verification-code/entities/verification-
 import { Like } from '../../like/entities/like.entity';
 import { Comment } from '../../comment/entities/comment.entity';
 import { Attachment } from '../../attachment/entities/attachment.entity';
+import { Upload } from 'src/scalars/upload.scalar';
+import { pathFinderMiddleware } from 'src/middlewares/pathFinderMiddleware';
 
 @ObjectType()
 @Entity()
@@ -33,9 +35,13 @@ export class User {
   @Column()
   password: string;
 
-  @Field({ nullable: true })
+  @Field(() => [Upload], { nullable: true })
   @Column({ nullable: true })
   bio?: string;
+
+  @Field({ nullable: true, middleware: [pathFinderMiddleware] })
+  @Column({ nullable: true })
+  profile_picture: string;
 
   @Field(() => [Tweet], { nullable: true })
   @OneToMany(() => Tweet, (tweet) => tweet.user)

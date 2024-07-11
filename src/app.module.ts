@@ -13,9 +13,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as entities from './entities';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        extensions: ['jpg', 'jpeg', 'png', 'gif'],
+        index: false,
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env`,
