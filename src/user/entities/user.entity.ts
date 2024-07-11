@@ -35,7 +35,7 @@ export class User {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  bio: string;
+  bio?: string;
 
   @Field(() => [Tweet], { nullable: true })
   @OneToMany(() => Tweet, (tweet) => tweet.user)

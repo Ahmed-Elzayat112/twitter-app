@@ -70,6 +70,10 @@ type User {
   attachments: [Attachment!]
 }
 
+type SignUserResponse {
+  access_token: String!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User!
@@ -109,6 +113,8 @@ type Mutation {
   createVerificationCode(createVerificationCodeInput: CreateVerificationCodeInput!): VerificationCode!
   updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): VerificationCode!
   removeVerificationCode(id: Int!): VerificationCode!
+  signup(createUserInput: CreateUserInput!): User!
+  login(signUserInput: SignUserInput!): SignUserResponse!
 }
 
 input CreateUserInput {
@@ -218,4 +224,11 @@ input UpdateVerificationCodeInput {
   expire_at: DateTime
   user_id: Float
   id: Int!
+}
+
+input SignUserInput {
+  email: String!
+  password: String!
+  bio: String
+  profile_picture: String
 }
