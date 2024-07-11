@@ -6,6 +6,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from '../user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthResolver } from './auth.resolver';
+import { VerificationCodeModule } from 'src/verification-code/verification-code.module';
 
 @Module({
   imports: [
@@ -13,8 +14,7 @@ import { AuthResolver } from './auth.resolver';
       isGlobal: true,
       envFilePath: `.env`,
     }),
-    UserModule,
-    PassportModule,
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -23,6 +23,10 @@ import { AuthResolver } from './auth.resolver';
         signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
       }),
     }),
+
+    UserModule,
+    PassportModule,
+    VerificationCodeModule,
   ],
   providers: [AuthService, JwtStrategy, AuthResolver],
   exports: [AuthService],

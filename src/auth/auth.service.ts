@@ -8,12 +8,14 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserInput } from 'src/user/dtos/create-user.input';
 import { User } from 'src/entities';
+import { VerificationCodeService } from 'src/verification-code/verification-code.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly verificationCodeService: VerificationCodeService,
   ) {}
 
   async jwtValidateUser(payload) {
@@ -44,8 +46,10 @@ export class AuthService {
       email: createUserInput.email,
       password: hashedPassword,
     };
+
     const user = await this.userService.create(newUser);
-    console.log(user);
+
+    await this.verificationCodeService.create(user.id);
     return user;
   }
 

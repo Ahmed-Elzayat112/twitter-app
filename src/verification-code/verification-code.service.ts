@@ -12,13 +12,26 @@ export class VerificationCodeService {
     private verificationCodesRepository: Repository<VerificationCode>,
   ) {}
 
-  create(
-    createVerificationCodeInput: CreateVerificationCodeInput,
-  ): Promise<VerificationCode> {
-    const newVerificationCode = this.verificationCodesRepository.create(
-      createVerificationCodeInput,
-    );
-    return this.verificationCodesRepository.save(newVerificationCode);
+  async create(user_id: number): Promise<VerificationCode> {
+    const code = Math.random().toString(36).substring(2, 7);
+    const created_at = new Date();
+    const expire_at = new Date();
+    expire_at.setMinutes(expire_at.getMinutes() + 10);
+
+    const verification: CreateVerificationCodeInput = {
+      code,
+      created_at,
+      expire_at,
+      user_id: user_id,
+    };
+
+    const newVerificationCode =
+      this.verificationCodesRepository.create(verification);
+
+    const createdVerificationCode =
+      await this.verificationCodesRepository.save(newVerificationCode);
+
+    return createdVerificationCode;
   }
 
   findAll(): Promise<VerificationCode[]> {

@@ -112,7 +112,7 @@ type Mutation {
   updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): Attachment!
   removeAttachment(id: Int!): Attachment!
   uploadFile(file: Upload!): String!
-  createVerificationCode(createVerificationCodeInput: CreateVerificationCodeInput!): VerificationCode!
+  createVerificationCode(user_id: Float!): VerificationCode!
   updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): VerificationCode!
   removeVerificationCode(id: Int!): VerificationCode!
   signup(createUserInput: CreateUserInput!): User!
@@ -215,13 +215,6 @@ input UpdateAttachmentInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
-
-input CreateVerificationCodeInput {
-  code: String!
-  created_at: DateTime!
-  expire_at: DateTime!
-  user_id: Float!
-}
 
 input UpdateVerificationCodeInput {
   code: String

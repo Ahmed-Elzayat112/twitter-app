@@ -12,10 +12,10 @@ export class VerificationCodeResolver {
 
   @Mutation(() => VerificationCode)
   createVerificationCode(
-    @Args('createVerificationCodeInput')
-    createVerificationCodeInput: CreateVerificationCodeInput,
+    @Args('user_id')
+    user_id: number,
   ) {
-    return this.verificationCodeService.create(createVerificationCodeInput);
+    return this.verificationCodeService.create(user_id);
   }
 
   @Query(() => [VerificationCode], { name: 'verificationCodes' })
