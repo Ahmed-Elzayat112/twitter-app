@@ -1,0 +1,221 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Comment {
+  id: Int!
+  content: String!
+  created_at: DateTime!
+  tweet: Tweet!
+  user: User!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Like {
+  id: Int!
+  tweet: Tweet!
+  user: User!
+}
+
+type Attachment {
+  id: Int!
+  type: String!
+  size: Float!
+  url: String!
+  thumbnail: String
+  tweet: Tweet!
+  user: User!
+}
+
+type Tweet {
+  id: Int!
+  content: String!
+  created_at: DateTime!
+  user: User!
+  comments: [Comment!]
+  likes: [Like!]
+  attachments: [Attachment!]
+}
+
+type Follow {
+  id: Int!
+  follower: User!
+  following: User!
+}
+
+type VerificationCode {
+  id: Int!
+  code: String!
+  created_at: DateTime!
+  expire_at: DateTime!
+  user: User!
+}
+
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  password: String!
+  bio: String
+  tweets: [Tweet!]
+  followers: [Follow!]
+  followings: [Follow!]
+  verificationCode: VerificationCode
+  likes: [Like!]
+  comments: [Comment!]
+  attachments: [Attachment!]
+}
+
+type Query {
+  users: [User!]!
+  user(id: Int!): User!
+  tweets: [Tweet!]!
+  tweet(id: Int!): Tweet!
+  comments: [Comment!]!
+  comment(id: Int!): Comment!
+  likes: [Like!]!
+  like(id: Int!): Like!
+  follows: [Follow!]!
+  follow(id: Int!): Follow!
+  attachments: [Attachment!]!
+  attachment(id: Int!): Attachment!
+  verificationCodes: [VerificationCode!]!
+  verificationCode(id: Int!): VerificationCode!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  createTweet(createTweetInput: CreateTweetInput!): Tweet!
+  updateTweet(updateTweetInput: UpdateTweetInput!): Tweet!
+  removeTweet(id: Int!): Tweet!
+  createComment(createCommentInput: CreateCommentInput!): Comment!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
+  removeComment(id: Int!): Comment!
+  createLike(createLikeInput: CreateLikeInput!): Like!
+  updateLike(updateLikeInput: UpdateLikeInput!): Like!
+  removeLike(id: Int!): Like!
+  createFollow(createFollowInput: CreateFollowInput!): Follow!
+  updateFollow(updateFollowInput: UpdateFollowInput!): Follow!
+  removeFollow(id: Int!): Follow!
+  createAttachment(createAttachmentInput: CreateAttachmentInput!): Attachment!
+  updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): Attachment!
+  removeAttachment(id: Int!): Attachment!
+  createVerificationCode(createVerificationCodeInput: CreateVerificationCodeInput!): VerificationCode!
+  updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): VerificationCode!
+  removeVerificationCode(id: Int!): VerificationCode!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+  bio: String
+  profile_picture: String
+}
+
+input UpdateUserInput {
+  username: String
+  email: String
+  password: String
+  bio: String
+  profile_picture: String
+  id: Int!
+}
+
+input CreateTweetInput {
+  content: String!
+  created_at: DateTime!
+  user_id: Float!
+}
+
+input UpdateTweetInput {
+  content: String
+  created_at: DateTime
+  user_id: Float
+  id: Int!
+}
+
+input CreateCommentInput {
+  content: String!
+  created_at: DateTime!
+  tweet_id: Float!
+  user_id: Float!
+}
+
+input UpdateCommentInput {
+  content: String
+  created_at: DateTime
+  tweet_id: Float
+  user_id: Float
+  id: Int!
+}
+
+input CreateLikeInput {
+  tweet_id: Int!
+  user_id: Int!
+}
+
+input UpdateLikeInput {
+  tweet_id: Int
+  user_id: Int
+  id: Int!
+}
+
+input CreateFollowInput {
+  follower_id: Int!
+  following_id: Int!
+}
+
+input UpdateFollowInput {
+  follower_id: Int
+  following_id: Int
+  id: Int!
+}
+
+input CreateAttachmentInput {
+  type: AttachmentType!
+  size: Float!
+  url: String!
+  thumbnail: String!
+  tweet_id: Float!
+  user_id: Float!
+}
+
+"""The types of attachments"""
+enum AttachmentType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  OTHER
+}
+
+input UpdateAttachmentInput {
+  type: AttachmentType
+  size: Float
+  url: String
+  thumbnail: String
+  tweet_id: Float
+  user_id: Float
+  id: Int!
+}
+
+input CreateVerificationCodeInput {
+  code: String!
+  created_at: DateTime!
+  expire_at: DateTime!
+  user_id: Float!
+}
+
+input UpdateVerificationCodeInput {
+  code: String
+  created_at: DateTime
+  expire_at: DateTime
+  user_id: Float
+  id: Int!
+}

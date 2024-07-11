@@ -37,12 +37,13 @@ import * as entities from './entities';
       },
     }),
 
-    // GraphQLModule.forRoot<ApolloDriverConfig>({
-    //   driver: ApolloDriver,
-    //   autoSchemaFile: 'src/schema.gql',
-    // }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: 'src/schema.gql',
+    }),
 
     TypeOrmModule.forFeature(Object.values(entities)),
+
     UserModule,
     TweetModule,
     CommentModule,

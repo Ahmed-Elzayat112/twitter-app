@@ -1,45 +1,68 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Tweet } from 'src/tweet/entities/tweet.entity';
-import { Follow } from 'src/follow/entities/follow.entity';
-import { VerificationCode } from 'src/verification-code/entities/verification-code.entity';
-import { Like } from 'src/like/entities/like.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Tweet } from '../../tweet/entities/tweet.entity';
+import { Follow } from '../../follow/entities/follow.entity';
+import { VerificationCode } from '../../verification-code/entities/verification-code.entity';
+import { Like } from '../../like/entities/like.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { Attachment } from '../../attachment/entities/attachment.entity';
 
+@ObjectType()
 @Entity()
 export class User {
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field()
   @Column()
   username: string;
 
+  @Field()
   @Column()
   email: string;
 
+  @Field()
+  @Column()
+  password: string;
+
+  @Field({ nullable: true })
   @Column({ nullable: true })
   bio: string;
 
-  @Column({ nullable: true })
-  profile_picture: string;
-
+  @Field(() => [Tweet], { nullable: true })
   @OneToMany(() => Tweet, (tweet) => tweet.user)
-  tweets: Tweet[];
+  tweets?: Tweet[];
 
+  @Field(() => [Follow], { nullable: true })
   @OneToMany(() => Follow, (follow) => follow.follower)
-  followers: Follow[];
+  followers?: Follow[];
 
+  @Field(() => [Follow], { nullable: true })
   @OneToMany(() => Follow, (follow) => follow.following)
-  following: Follow[];
+  followings?: Follow[];
 
-  @OneToMany(
-    () => VerificationCode,
-    (verificationCode) => verificationCode.user,
-  )
-  verificationCodes: VerificationCode[];
+  @Field(() => VerificationCode, { nullable: true })
+  @OneToOne(() => VerificationCode)
+  @JoinColumn()
+  verificationCode?: VerificationCode;
 
+  @Field(() => [Like], { nullable: true })
   @OneToMany(() => Like, (like) => like.user)
-  likes: Like[];
+  likes?: Like[];
 
+  @Field(() => [Comment], { nullable: true })
   @OneToMany(() => Comment, (comment) => comment.user)
-  comments: Comment[];
+  comments?: Comment[];
+
+  @Field(() => [Attachment], { nullable: true })
+  @OneToMany(() => Attachment, (attachment) => attachment.user)
+  attachments?: Attachment[];
 }
