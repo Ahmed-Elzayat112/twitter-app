@@ -3,6 +3,9 @@ import { AttachmentService } from './attachment.service';
 import { Attachment } from './entities/attachment.entity';
 import { CreateAttachmentInput } from './dtos/create-attachment.input';
 import { UpdateAttachmentInput } from './dtos/update-attachment.input';
+import * as  GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import { IFile } from './file.type';
+import { uploadFileStream } from 'src/utils/upload';
 
 @Resolver(() => Attachment)
 export class AttachmentResolver {
@@ -38,5 +41,10 @@ export class AttachmentResolver {
   @Mutation(() => Attachment)
   removeAttachment(@Args('id', { type: () => Int }) id: number) {
     return this.attachmentService.remove(id);
+  }
+
+  @Mutation(() => String)
+ async uploadFile(@Args('file', { type: () => GraphQLUpload }) file: IFile) {
+    return await uploadFileStream(file.createReadStream , 'uploads' , `${Date.now()}_${file.filename}`)
   }
 }

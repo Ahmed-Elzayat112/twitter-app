@@ -35,7 +35,7 @@ export class User {
   @Column()
   password: string;
 
-  @Field(() => [Upload], { nullable: true })
+  @Field({ nullable: true })
   @Column({ nullable: true })
   bio?: string;
 

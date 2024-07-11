@@ -2,8 +2,9 @@ import { NotFoundException } from '@nestjs/common';
 import { createWriteStream, mkdirSync } from 'fs';
 import { join } from 'path';
 import { finished } from 'stream/promises';
+import { ReadStream } from 'typeorm/platform/PlatformTools';
 
-export const uploadFileStream = async (readStream, uploadDir, filename) => {
+export const uploadFileStream = async (readStream :() => ReadStream, uploadDir : string, filename : string) => {
   const fileName = filename;
   const filePath = join(uploadDir, fileName);
   console.log(`file path: ${filePath}`);
@@ -19,4 +20,5 @@ export const uploadFileStream = async (readStream, uploadDir, filename) => {
       console.log(err.message);
       throw new NotFoundException(err.message);
     });
+    return `${uploadDir}/${fileName}`
 };
