@@ -55,6 +55,15 @@ type VerificationCode {
   user: User!
 }
 
+type Session {
+  id: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  user: User!
+  user_id: Int!
+}
+
 type User {
   id: Int!
   username: String!
@@ -69,10 +78,11 @@ type User {
   likes: [Like!]
   comments: [Comment!]
   attachments: [Attachment!]
+  sessions: [Session!]!
 }
 
 type SignUserResponse {
-  access_token: String!
+  accessToken: String!
 }
 
 type Query {
@@ -113,8 +123,11 @@ type Mutation {
   removeAttachment(id: Int!): Attachment!
   uploadFile(file: Upload!): String!
   createVerificationCode(user_id: Float!): VerificationCode!
+  verifyCode(user_id: Float!, code: String!): Boolean!
   updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): VerificationCode!
   removeVerificationCode(id: Int!): VerificationCode!
+  refreshToken: String!
+  logout: Boolean!
   signup(createUserInput: CreateUserInput!): User!
   login(signUserInput: SignUserInput!): SignUserResponse!
 }
@@ -123,6 +136,7 @@ input CreateUserInput {
   username: String!
   email: String!
   password: String!
+  verified: Boolean! = false
   bio: String
   profile_picture: String
 }
@@ -131,6 +145,7 @@ input UpdateUserInput {
   username: String
   email: String
   password: String
+  verified: Boolean = false
   bio: String
   profile_picture: String
   id: Int!

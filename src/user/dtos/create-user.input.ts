@@ -11,6 +11,9 @@ export class CreateUserInput {
   @Field()
   password: string;
 
+  @Field({ defaultValue: false })
+  verified: boolean;
+
   @Field({ nullable: true })
   bio?: string;
 

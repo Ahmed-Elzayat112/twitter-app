@@ -15,6 +15,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import * as entities from './entities';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     AttachmentModule,
     VerificationCodeModule,
     AuthModule,
+    SessionModule,
   ],
   providers: [AppService],
 })

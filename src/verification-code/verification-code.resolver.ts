@@ -1,7 +1,6 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { VerificationCodeService } from './verification-code.service';
 import { VerificationCode } from './entities/verification-code.entity';
-import { CreateVerificationCodeInput } from './dtos/create-verification-code.input';
 import { UpdateVerificationCodeInput } from './dtos/update-verification-code.input';
 
 @Resolver(() => VerificationCode)
@@ -16,6 +15,11 @@ export class VerificationCodeResolver {
     user_id: number,
   ) {
     return this.verificationCodeService.create(user_id);
+  }
+
+  @Mutation(() => Boolean)
+  verifyCode(@Args('user_id') user_id: number, @Args('code') code: string) {
+    return this.verificationCodeService.verifyCode(user_id, code);
   }
 
   @Query(() => [VerificationCode], { name: 'verificationCodes' })

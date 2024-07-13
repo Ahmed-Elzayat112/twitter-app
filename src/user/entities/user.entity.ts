@@ -13,8 +13,8 @@ import { VerificationCode } from '../../verification-code/entities/verification-
 import { Like } from '../../like/entities/like.entity';
 import { Comment } from '../../comment/entities/comment.entity';
 import { Attachment } from '../../attachment/entities/attachment.entity';
-import { Upload } from 'src/scalars/upload.scalar';
 import { pathFinderMiddleware } from 'src/middlewares/pathFinderMiddleware';
+import { Session } from 'src/entities/session.entity';
 
 @ObjectType()
 @Entity()
@@ -34,6 +34,9 @@ export class User {
   @Field()
   @Column()
   password: string;
+
+  @Column({ default: false })
+  verified: boolean;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -71,4 +74,8 @@ export class User {
   @Field(() => [Attachment], { nullable: true })
   @OneToMany(() => Attachment, (attachment) => attachment.user)
   attachments?: Attachment[];
+
+  @Field(() => [Session])
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 }

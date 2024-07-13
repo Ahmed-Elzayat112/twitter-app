@@ -9,6 +9,8 @@ import * as bcrypt from 'bcryptjs';
 import { CreateUserInput } from 'src/user/dtos/create-user.input';
 import { User } from 'src/entities';
 import { VerificationCodeService } from 'src/verification-code/verification-code.service';
+import { ConfigService } from '@nestjs/config';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class AuthService {
@@ -16,13 +18,50 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly verificationCodeService: VerificationCodeService,
+    private readonly configService: ConfigService,
+    private readonly sessionService: SessionService,
   ) {}
 
-  async jwtValidateUser(payload) {
-    const { id } = payload;
-    const user = await this.userService.findOne(id);
-    return user;
+  async createJwtToken(user: User) {
+    const refreshTokenExpiresIn = this.configService.get<string>(
+      'JWT_REFRESH_TOKEN_EXPIRES_IN',
+    );
+
+    const session = await this.sessionService.create(user);
+
+    const accessToken = await this.createAccessToken(session.id);
+    const refreshToken = this.jwtService.sign(
+      {
+        id: session.id,
+        type: 'REFRESH',
+      },
+      {
+        expiresIn: refreshTokenExpiresIn,
+      },
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
+
+  async createAccessToken(sessionId: number) {
+    const accessTokenExpiresIn = this.configService.get<string>(
+      'JWT_ACCESS_TOKEN_EXPIRES_IN',
+    );
+
+    const payload = {
+      id: sessionId,
+      type: 'ACCESS',
+    };
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: accessTokenExpiresIn,
+    });
+
+    return accessToken;
+  }
+
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userService.findOneByEmail(email);
     if (user && bcrypt.compare(user.password, pass)) {
@@ -39,17 +78,19 @@ export class AuthService {
     if (userExists) {
       throw new BadRequestException('email already exists');
     }
+
     const hashedPassword = await bcrypt.hash(createUserInput.password, 12);
 
     const newUser: CreateUserInput = {
       username: createUserInput.username,
       email: createUserInput.email,
       password: hashedPassword,
+      verified: false,
     };
 
     const user = await this.userService.create(newUser);
 
-    await this.verificationCodeService.create(user.id);
+    await this.verificationCodeService.create(user.id); // TODO: should we make this transaction here?
     return user;
   }
 
@@ -58,9 +99,11 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { id: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+
+    if (!user.verified) {
+      throw new UnauthorizedException('Account not verified');
+    }
+
+    return this.createJwtToken(user);
   }
 }
