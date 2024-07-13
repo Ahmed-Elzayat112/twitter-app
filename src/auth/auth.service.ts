@@ -90,7 +90,7 @@ export class AuthService {
 
     const user = await this.userService.create(newUser);
 
-    await this.verificationCodeService.create(user.id); // TODO: should we make this transaction here?
+    await this.verificationCodeService.create(user.id); // TODO: should we make this transaction?
     return user;
   }
 

@@ -31,10 +31,10 @@ export class User {
   @Column()
   email: string;
 
-  @Field()
   @Column()
   password: string;
 
+  @Field()
   @Column({ default: false })
   verified: boolean;
 

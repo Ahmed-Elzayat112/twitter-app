@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
+import { GqlUserResponse, GqlUsersResponse } from './user.response';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -15,7 +16,7 @@ export class UserResolver {
     return this.userService.create(createUserInput);
   }
 
-  @Query(() => [User], { name: 'users' })
+  @Query(() => GqlUsersResponse, { name: 'users' })
   @UseGuards(GqlAuthGuard)
   findAll() {
     return this.userService.findAll();
@@ -26,7 +27,7 @@ export class UserResolver {
     return this.userService.findOne(id);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => GqlUserResponse)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.userService.update(updateUserInput.id, updateUserInput);
   }

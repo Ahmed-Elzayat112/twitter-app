@@ -28,8 +28,12 @@ export class FollowService {
       throw new Error('Follower or following user not found');
     }
 
-    const newFollow = this.followsRepository.create({ follower, following });
-    console.log(newFollow);
+    const newFollow = this.followsRepository.create({
+      follower,
+      following,
+      ...createFollowInput,
+    });
+
     return this.followsRepository.save(newFollow);
   }
 

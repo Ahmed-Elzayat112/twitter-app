@@ -5,6 +5,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Comment } from '../../comment/entities/comment.entity';
@@ -24,6 +25,7 @@ export class Tweet {
 
   @Field()
   @Column()
+  @CreateDateColumn()
   created_at: Date;
 
   @Field(() => User)

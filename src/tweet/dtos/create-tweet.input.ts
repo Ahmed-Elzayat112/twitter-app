@@ -6,8 +6,5 @@ export class CreateTweetInput {
   content: string;
 
   @Field()
-  created_at: Date;
-
-  @Field()
   user_id: number;
 }

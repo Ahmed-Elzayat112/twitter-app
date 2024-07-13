@@ -3,11 +3,12 @@ import { CreateUserInput } from 'src/user/dtos/create-user.input';
 import { AuthService } from './auth.service';
 import { Session, User } from 'src/entities';
 import { SignUserInput } from 'src/auth/dtos/signin-user.dto';
-import { SignUserResponse } from './dtos/signin-res.dto';
+import { GqlSignUserResponse, SignUserResponse } from './dtos/signin-res.dto';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SessionParam } from 'src/decorators/session.decorator';
 import { SessionService } from 'src/session/session.service';
+import { GqlUserResponse } from 'src/user/user.response';
 
 @Resolver()
 export class AuthResolver {
@@ -28,12 +29,12 @@ export class AuthResolver {
     return this.sessionService.delete(id);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => GqlUserResponse)
   signup(@Args('createUserInput') createUserInput: CreateUserInput) {
     this.authService.signup(createUserInput);
   }
 
-  @Mutation(() => SignUserResponse)
+  @Mutation(() => GqlSignUserResponse)
   async login(
     @Args('signUserInput') signUserInput: SignUserInput,
   ): Promise<SignUserResponse> {

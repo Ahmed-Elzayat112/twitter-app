@@ -4,18 +4,35 @@ import { DeepPartial, Repository } from 'typeorm';
 import { Like } from './entities/like.entity';
 import { CreateLikeInput } from './dtos/create-like.input';
 import { UpdateLikeInput } from './dtos/update-like.input';
+import { User } from 'src/entities';
+import { UserService } from 'src/user/user.service';
+import { TweetService } from 'src/tweet/tweet.service';
 
 @Injectable()
 export class LikeService {
   constructor(
     @InjectRepository(Like)
     private likesRepository: Repository<Like>,
+    private usersService: UserService,
+    private tweetsService: TweetService,
   ) {}
 
-  create(createLikeInput: CreateLikeInput): Promise<Like> {
-    const newLike = this.likesRepository.create(
-      createLikeInput as DeepPartial<Like>,
-    );
+  async create(createLikeInput: CreateLikeInput): Promise<Like> {
+    const { tweet_id, user_id } = createLikeInput;
+
+    const user = await this.usersService.findOne(user_id);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const tweet = await this.tweetsService.findOne(tweet_id);
+
+    if (!tweet) {
+      throw new Error('Tweet not found');
+    }
+
+    const newLike = this.likesRepository.create({ user, tweet });
     return this.likesRepository.save(newLike);
   }
 

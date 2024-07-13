@@ -68,7 +68,7 @@ type User {
   id: Int!
   username: String!
   email: String!
-  password: String!
+  verified: Boolean!
   bio: String
   profile_picture: String
   tweets: [Tweet!]
@@ -81,55 +81,145 @@ type User {
   sessions: [Session!]!
 }
 
+type GqlUserResponse {
+  data: User!
+  status: String!
+  message: String!
+}
+
+type GqlUsersResponse {
+  data: [User!]!
+  status: String!
+  message: String!
+}
+
+type GqlTweetResponse {
+  data: Tweet!
+  status: String!
+  message: String!
+}
+
+type GqlTweetsResponse {
+  data: [Tweet!]!
+  status: String!
+  message: String!
+}
+
+type GqlCommentResponse {
+  data: Comment!
+  status: String!
+  message: String!
+}
+
+type GqlCommentsResponse {
+  data: [Comment!]!
+  status: String!
+  message: String!
+}
+
+type GqlLikeResponse {
+  data: Like!
+  status: String!
+  message: String!
+}
+
+type GqlLikesResponse {
+  data: [Like!]!
+  status: String!
+  message: String!
+}
+
+type GqlFollowResponse {
+  data: Follow!
+  status: String!
+  message: String!
+}
+
+type GqlFollowsResponse {
+  data: [Follow!]!
+  status: String!
+  message: String!
+}
+
+type GqlAttachmentResponse {
+  data: Attachment!
+  status: String!
+  message: String!
+}
+
+type GqlAttachmentsResponse {
+  data: [Attachment!]!
+  status: String!
+  message: String!
+}
+
 type SignUserResponse {
   accessToken: String!
 }
 
+type GqlSignUserResponseResponse {
+  data: SignUserResponse!
+  status: String!
+  message: String!
+}
+
+type GqlVerificationCodeResponse {
+  data: VerificationCode!
+  status: String!
+  message: String!
+}
+
+type GqlVerificationCodesResponse {
+  data: [VerificationCode!]!
+  status: String!
+  message: String!
+}
+
 type Query {
-  users: [User!]!
+  users: GqlUsersResponse!
   user(id: Int!): User!
-  tweets: [Tweet!]!
-  tweet(id: Int!): Tweet!
-  comments: [Comment!]!
-  comment(id: Int!): Comment!
-  likes: [Like!]!
-  like(id: Int!): Like!
-  follows: [Follow!]!
-  follow(id: Int!): Follow!
-  attachments: [Attachment!]!
-  attachment(id: Int!): Attachment!
-  verificationCodes: [VerificationCode!]!
-  verificationCode(id: Int!): VerificationCode!
+  tweets: GqlTweetsResponse!
+  tweet(id: Int!): GqlTweetResponse!
+  comments: GqlCommentsResponse!
+  comment(id: Int!): GqlCommentResponse!
+  likes: GqlLikesResponse!
+  like(id: Int!): GqlLikeResponse!
+  follows: GqlFollowsResponse!
+  follow(id: Int!): GqlFollowResponse!
+  attachments: GqlAttachmentsResponse!
+  attachment(id: Int!): GqlAttachmentResponse!
+  verificationCodes: GqlVerificationCodesResponse!
+  verificationCode(id: Int!): GqlVerificationCodeResponse!
 }
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): GqlUserResponse!
   removeUser(id: Int!): User!
-  createTweet(createTweetInput: CreateTweetInput!): Tweet!
-  updateTweet(updateTweetInput: UpdateTweetInput!): Tweet!
-  removeTweet(id: Int!): Tweet!
-  createComment(createCommentInput: CreateCommentInput!): Comment!
-  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
-  removeComment(id: Int!): Comment!
-  createLike(createLikeInput: CreateLikeInput!): Like!
-  updateLike(updateLikeInput: UpdateLikeInput!): Like!
-  removeLike(id: Int!): Like!
-  createFollow(createFollowInput: CreateFollowInput!): Follow!
-  updateFollow(updateFollowInput: UpdateFollowInput!): Follow!
-  removeFollow(id: Int!): Follow!
-  createAttachment(createAttachmentInput: CreateAttachmentInput!): Attachment!
-  updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): Attachment!
+  createTweet(createTweetInput: CreateTweetInput!): GqlTweetResponse!
+  updateTweet(updateTweetInput: UpdateTweetInput!): GqlTweetResponse!
+  removeTweet(id: Int!): GqlTweetResponse!
+  createComment(createCommentInput: CreateCommentInput!): GqlCommentResponse!
+  updateComment(updateCommentInput: UpdateCommentInput!): GqlCommentResponse!
+  removeComment(id: Int!): GqlCommentResponse!
+  createLike(createLikeInput: CreateLikeInput!): GqlLikeResponse!
+  updateLike(updateLikeInput: UpdateLikeInput!): GqlLikeResponse!
+  removeLike(id: Int!): GqlLikeResponse!
+  createFollow(createFollowInput: CreateFollowInput!): GqlFollowResponse!
+  updateFollow(updateFollowInput: UpdateFollowInput!): GqlFollowResponse!
+  removeFollow(id: Int!): GqlFollowResponse!
+  createAttachment(createAttachmentInput: CreateAttachmentInput!): GqlAttachmentResponse!
+  updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): GqlAttachmentResponse!
   removeAttachment(id: Int!): Attachment!
   uploadFile(file: Upload!): String!
-  createVerificationCode(user_id: Float!): VerificationCode!
+  createVerificationCode(user_id: Float!): GqlVerificationCodeResponse!
   verifyCode(user_id: Float!, code: String!): Boolean!
-  updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): VerificationCode!
-  removeVerificationCode(id: Int!): VerificationCode!
+  updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): GqlVerificationCodeResponse!
+  removeVerificationCode(id: Int!): GqlVerificationCodeResponse!
   refreshToken: String!
   logout: Boolean!
-  signup(createUserInput: CreateUserInput!): User!
-  login(signUserInput: SignUserInput!): SignUserResponse!
+  signup(createUserInput: CreateUserInput!): GqlUserResponse!
+  login(signUserInput: SignUserInput!): GqlSignUserResponseResponse!
 }
 
 input CreateUserInput {
@@ -153,13 +243,11 @@ input UpdateUserInput {
 
 input CreateTweetInput {
   content: String!
-  created_at: DateTime!
   user_id: Float!
 }
 
 input UpdateTweetInput {
   content: String
-  created_at: DateTime
   user_id: Float
   id: Int!
 }

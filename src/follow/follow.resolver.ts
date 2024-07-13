@@ -3,38 +3,39 @@ import { FollowService } from './follow.service';
 import { Follow } from './entities/follow.entity';
 import { CreateFollowInput } from './dtos/create-follow.input';
 import { UpdateFollowInput } from './dtos/update-follow.input';
+import { GqlFollowResponse, GqlFollowsResponse } from './follow.res';
 
 @Resolver(() => Follow)
 export class FollowResolver {
   constructor(private readonly followService: FollowService) {}
 
-  @Mutation(() => Follow)
+  @Mutation(() => GqlFollowResponse)
   createFollow(
     @Args('createFollowInput') createFollowInput: CreateFollowInput,
   ) {
     return this.followService.create(createFollowInput);
   }
 
-  @Query(() => [Follow], { name: 'follows' })
+  @Query(() => GqlFollowsResponse, { name: 'follows' })
   async findAll() {
     const res = await this.followService.findAll();
     console.log(res);
     return res;
   }
 
-  @Query(() => Follow, { name: 'follow' })
+  @Query(() => GqlFollowResponse, { name: 'follow' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.followService.findOne(id);
   }
 
-  @Mutation(() => Follow)
+  @Mutation(() => GqlFollowResponse)
   updateFollow(
     @Args('updateFollowInput') updateFollowInput: UpdateFollowInput,
   ) {
     return this.followService.update(updateFollowInput.id, updateFollowInput);
   }
 
-  @Mutation(() => Follow)
+  @Mutation(() => GqlFollowResponse)
   removeFollow(@Args('id', { type: () => Int }) id: number) {
     return this.followService.remove(id);
   }

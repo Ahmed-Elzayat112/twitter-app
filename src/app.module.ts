@@ -16,6 +16,8 @@ import * as entities from './entities';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { SessionModule } from './session/session.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './interceptors/response.interceptor';
 
 @Module({
   imports: [
@@ -65,6 +67,12 @@ import { SessionModule } from './session/session.module';
     AuthModule,
     SessionModule,
   ],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

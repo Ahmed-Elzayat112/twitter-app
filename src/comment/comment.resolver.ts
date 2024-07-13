@@ -3,29 +3,30 @@ import { CommentService } from './comment.service';
 import { Comment } from './entities/comment.entity';
 import { CreateCommentInput } from './dtos/create-comment.input';
 import { UpdateCommentInput } from './dtos/update-comment.input';
+import { GqlCommentResponse, GqlCommentsResponse } from './comment.res';
 
-@Resolver(() => Comment)
+@Resolver(() => GqlCommentResponse)
 export class CommentResolver {
   constructor(private readonly commentService: CommentService) {}
 
-  @Mutation(() => Comment)
+  @Mutation(() => GqlCommentResponse)
   createComment(
     @Args('createCommentInput') createCommentInput: CreateCommentInput,
   ) {
     return this.commentService.create(createCommentInput);
   }
 
-  @Query(() => [Comment], { name: 'comments' })
+  @Query(() => GqlCommentsResponse, { name: 'comments' })
   findAll() {
     return this.commentService.findAll();
   }
 
-  @Query(() => Comment, { name: 'comment' })
+  @Query(() => GqlCommentResponse, { name: 'comment' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.commentService.findOne(id);
   }
 
-  @Mutation(() => Comment)
+  @Mutation(() => GqlCommentResponse)
   updateComment(
     @Args('updateCommentInput') updateCommentInput: UpdateCommentInput,
   ) {
@@ -35,7 +36,7 @@ export class CommentResolver {
     );
   }
 
-  @Mutation(() => Comment)
+  @Mutation(() => GqlCommentResponse)
   removeComment(@Args('id', { type: () => Int }) id: number) {
     return this.commentService.remove(id);
   }

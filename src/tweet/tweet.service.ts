@@ -4,16 +4,29 @@ import { Repository } from 'typeorm';
 import { Tweet } from './entities/tweet.entity';
 import { CreateTweetInput } from './dtos/create-tweet.input';
 import { UpdateTweetInput } from './dtos/update-tweet.input';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class TweetService {
   constructor(
     @InjectRepository(Tweet)
     private tweetsRepository: Repository<Tweet>,
+    private usersService: UserService,
   ) {}
 
-  create(createTweetInput: CreateTweetInput): Promise<Tweet> {
-    const newTweet = this.tweetsRepository.create(createTweetInput);
+  async create(createTweetInput: CreateTweetInput): Promise<Tweet> {
+    const { content, user_id } = createTweetInput;
+
+    const user = await this.usersService.findOne(user_id);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const newTweet = this.tweetsRepository.create({
+      content,
+      user,
+    });
     return this.tweetsRepository.save(newTweet);
   }
 

@@ -3,32 +3,33 @@ import { LikeService } from './like.service';
 import { Like } from './entities/like.entity';
 import { CreateLikeInput } from './dtos/create-like.input';
 import { UpdateLikeInput } from './dtos/update-like.input';
+import { GqlLikeResponse, GqlLikesResponse } from './like.res';
 
 @Resolver(() => Like)
 export class LikeResolver {
   constructor(private readonly likeService: LikeService) {}
 
-  @Mutation(() => Like)
+  @Mutation(() => GqlLikeResponse)
   createLike(@Args('createLikeInput') createLikeInput: CreateLikeInput) {
     return this.likeService.create(createLikeInput);
   }
 
-  @Query(() => [Like], { name: 'likes' })
+  @Query(() => GqlLikesResponse, { name: 'likes' })
   findAll() {
     return this.likeService.findAll();
   }
 
-  @Query(() => Like, { name: 'like' })
+  @Query(() => GqlLikeResponse, { name: 'like' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.likeService.findOne(id);
   }
 
-  @Mutation(() => Like)
+  @Mutation(() => GqlLikeResponse)
   updateLike(@Args('updateLikeInput') updateLikeInput: UpdateLikeInput) {
     return this.likeService.update(updateLikeInput.id, updateLikeInput);
   }
 
-  @Mutation(() => Like)
+  @Mutation(() => GqlLikeResponse)
   removeLike(@Args('id', { type: () => Int }) id: number) {
     return this.likeService.remove(id);
   }

@@ -4,18 +4,60 @@ import { UpdateAttachmentInput } from './dtos/update-attachment.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Attachment } from './entities/attachment.entity';
+import { UserService } from 'src/user/user.service';
+import { TweetService } from 'src/tweet/tweet.service';
 
 @Injectable()
 export class AttachmentService {
   constructor(
     @InjectRepository(Attachment)
     private attachmentRepository: Repository<Attachment>,
+    private usersService: UserService,
+    private tweetsService: TweetService,
   ) {}
 
-  create(createAttachmentInput: CreateAttachmentInput): Promise<Attachment> {
-    const attachment = this.attachmentRepository.create(createAttachmentInput);
+  async create(
+    createAttachmentInput: CreateAttachmentInput,
+  ): Promise<Attachment> {
+    const { tweet_id, user_id } = createAttachmentInput;
+
+    const user = await this.usersService.findOne(user_id);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const tweet = await this.tweetsService.findOne(tweet_id);
+
+    if (!tweet) {
+      throw new Error('Tweet not found');
+    }
+
+    const attachment = this.attachmentRepository.create({
+      user,
+      tweet,
+      ...createAttachmentInput,
+    });
     return this.attachmentRepository.save(attachment);
   }
+
+  /*
+    async create(createTweetInput: CreateTweetInput): Promise<Tweet> {
+    const { content, user_id } = createTweetInput;
+
+    const user = await this.usersService.findOne(user_id);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const newTweet = this.tweetsRepository.create({
+      content,
+      user,
+    });
+    return this.tweetsRepository.save(newTweet);
+  }
+  */
 
   findAll(): Promise<Attachment[]> {
     return this.attachmentRepository.find({ relations: ['tweet', 'user'] });
