@@ -1,5 +1,5 @@
 import { InputType, Field, ObjectType } from '@nestjs/graphql';
-import { generateGqlResponse } from 'src/utils/response';
+import { generateGqlResponse } from 'src/utils/Gql-response';
 
 @ObjectType()
 export class SignUserResponse {

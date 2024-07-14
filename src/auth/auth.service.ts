@@ -75,8 +75,12 @@ export class AuthService {
     const { email } = createUserInput;
     const userExists = await this.userService.findOneByEmail(email);
 
-    if (userExists) {
+    if (userExists && userExists.verified) {
       throw new BadRequestException('email already exists');
+    }
+
+    if (userExists && userExists.verified === false) {
+      this.userService.remove(userExists.id);
     }
 
     const hashedPassword = await bcrypt.hash(createUserInput.password, 12);
@@ -90,7 +94,7 @@ export class AuthService {
 
     const user = await this.userService.create(newUser);
 
-    await this.verificationCodeService.create(user.id); // TODO: should we make this transaction?
+    await this.verificationCodeService.create(user.id); // TODO: should we make this transaction? user can be created but not sending code
     return user;
   }
 

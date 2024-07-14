@@ -37,6 +37,8 @@ export class VerificationCodeService {
     const createdVerificationCode =
       await this.verificationCodesRepository.save(newVerificationCode);
 
+    console.log(createdVerificationCode);
+
     // Send email
     const transporter = nodemailer.createTransport({
       service: 'gmail',

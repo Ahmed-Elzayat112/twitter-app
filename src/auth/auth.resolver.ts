@@ -30,8 +30,10 @@ export class AuthResolver {
   }
 
   @Mutation(() => GqlUserResponse)
-  signup(@Args('createUserInput') createUserInput: CreateUserInput) {
-    this.authService.signup(createUserInput);
+  async signup(@Args('createUserInput') createUserInput: CreateUserInput) {
+    const signedUp = await this.authService.signup(createUserInput);
+    console.log(signedUp);
+    return signedUp;
   }
 
   @Mutation(() => GqlSignUserResponse)

@@ -68,7 +68,6 @@ type User {
   id: Int!
   username: String!
   email: String!
-  verified: Boolean!
   bio: String
   profile_picture: String
   tweets: [Tweet!]
@@ -163,6 +162,16 @@ type GqlSignUserResponseResponse {
   message: String!
 }
 
+type VerifyCode {
+  verified: Boolean!
+}
+
+type GqlVerifyCodeResponse {
+  data: VerifyCode!
+  status: String!
+  message: String!
+}
+
 type GqlVerificationCodeResponse {
   data: VerificationCode!
   status: String!
@@ -212,8 +221,8 @@ type Mutation {
   updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): GqlAttachmentResponse!
   removeAttachment(id: Int!): Attachment!
   uploadFile(file: Upload!): String!
-  createVerificationCode(user_id: Float!): GqlVerificationCodeResponse!
-  verifyCode(user_id: Float!, code: String!): Boolean!
+  createVerificationCode(user_id: Int!): GqlVerificationCodeResponse!
+  verifyCode(user_id: Int!, code: String!): GqlVerifyCodeResponse!
   updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): GqlVerificationCodeResponse!
   removeVerificationCode(id: Int!): GqlVerificationCodeResponse!
   refreshToken: String!

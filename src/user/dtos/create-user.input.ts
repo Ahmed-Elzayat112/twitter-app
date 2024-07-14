@@ -1,10 +1,13 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
+import { IsEmail } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 @InputType()
 export class CreateUserInput {
   @Field()
   username: string;
 
+  @IsEmail({}, { message: i18nValidationMessage('validation.INVALID_EMAIL') })
   @Field()
   email: string;
 

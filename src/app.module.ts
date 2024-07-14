@@ -13,14 +13,39 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as entities from './entities';
-import { join } from 'path';
+import path, { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { SessionModule } from './session/session.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './interceptors/response.interceptor';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+import {
+  AcceptLanguageResolver,
+  CookieResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
 
 @Module({
   imports: [
+    I18nModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        fallbackLanguage: configService.getOrThrow('FALLBACK_LANGUAGE'),
+        loaderOptions: {
+          path: join(__dirname, '/i18n/'),
+          watch: true,
+        },
+      }),
+      resolvers: [
+        new QueryResolver(['lang', 'l']),
+        new HeaderResolver(['x-custom-lang']),
+        new CookieResolver(),
+        AcceptLanguageResolver,
+      ],
+      inject: [ConfigService],
+    }),
+
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
@@ -29,6 +54,7 @@ import { TransformInterceptor } from './interceptors/response.interceptor';
         index: false,
       },
     }),
+
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env`,
@@ -71,6 +97,10 @@ import { TransformInterceptor } from './interceptors/response.interceptor';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
     AppService,
   ],

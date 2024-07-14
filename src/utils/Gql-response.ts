@@ -37,8 +37,10 @@ export function generateGqlResponse<TItem extends object>(
         @Field()
         message: string;
       }
+
       return GqlResponse;
     }
+
     @ObjectType(`Gql${TItemClass[0].name}PaginationResponse`)
     abstract class GqlResponse {
       @Field((type) => [TItemClass[0]])

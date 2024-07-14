@@ -5,25 +5,59 @@ import { UpdateVerificationCodeInput } from './dtos/update-verification-code.inp
 import {
   GqlVerificationCodeResponse,
   GqlVerificationCodesResponse,
+  VerifyCodeResponse,
 } from './verification.res';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 
 @Resolver(() => VerificationCode)
 export class VerificationCodeResolver {
   constructor(
     private readonly verificationCodeService: VerificationCodeService,
+    private readonly i18n: I18nService,
   ) {}
 
   @Mutation(() => GqlVerificationCodeResponse)
   createVerificationCode(
-    @Args('user_id')
+    @Args('user_id', { type: () => Int })
     user_id: number,
   ) {
     return this.verificationCodeService.create(user_id);
   }
 
-  @Mutation(() => Boolean)
-  verifyCode(@Args('user_id') user_id: number, @Args('code') code: string) {
-    return this.verificationCodeService.verifyCode(user_id, code);
+  @Mutation(() => VerifyCodeResponse)
+  async verifyCode(
+    @Args('user_id', { type: () => Int }) user_id: number,
+    @Args('code') code: string,
+  ) {
+    try {
+      const verified = await this.verificationCodeService.verifyCode(
+        user_id,
+        code,
+      );
+      const message = this.i18n.translate('errors.VERIFICATION_SUCCESS', {
+        lang: I18nContext.current().lang,
+      });
+
+      return {
+        data: { verified },
+        status: 'success',
+        message,
+      };
+    } catch (error) {
+      const message = this.i18n.t('errors.VERIFICATION_FAILURE', {
+        lang: I18nContext.current().lang,
+      });
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message,
+          timestamp: new Date().toISOString(),
+          path: '/verify-code',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Query(() => GqlVerificationCodesResponse, { name: 'verificationCodes' })
