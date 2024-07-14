@@ -53,12 +53,19 @@ export class AttachmentService {
   }
 
   async update(id: number, updateAttachmentInput: UpdateAttachmentInput) {
-    await this.attachmentRepository.update(id, updateAttachmentInput);
-    return this.findOne(id);
+    const attachments = await this.attachmentRepository.findOneBy({ id });
+    if (!attachments) {
+      throw new Error('Attachment not found');
+    }
+    Object.assign(attachments, updateAttachmentInput);
+    return this.attachmentRepository.save(attachments);
   }
 
   async remove(id: number): Promise<Attachment[]> {
     const attachment = await this.findOne(id);
+    if (!attachment) {
+      throw new Error('Attachment not found');
+    }
     await this.attachmentRepository.remove(attachment);
     return attachment;
   }

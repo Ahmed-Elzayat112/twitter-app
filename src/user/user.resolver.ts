@@ -5,13 +5,13 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
-import { GqlUserResponse, GqlUsersResponse } from './user.response';
+import { GqlUserResponse, GqlUsersResponse } from './user.res';
 
 @Resolver(() => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation(() => User)
+  @Mutation(() => GqlUserResponse)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
     return this.userService.create(createUserInput);
   }
@@ -22,7 +22,7 @@ export class UserResolver {
     return this.userService.findAll();
   }
 
-  @Query(() => User, { name: 'user' })
+  @Query(() => GqlUserResponse, { name: 'user' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.userService.findOne(id);
   }
@@ -32,7 +32,7 @@ export class UserResolver {
     return this.userService.update(updateUserInput.id, updateUserInput);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => GqlUserResponse)
   removeUser(@Args('id', { type: () => Int }) id: number) {
     return this.userService.remove(id);
   }

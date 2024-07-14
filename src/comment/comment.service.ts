@@ -52,12 +52,19 @@ export class CommentService {
     id: number,
     updateCommentInput: UpdateCommentInput,
   ): Promise<Comment> {
-    await this.commentsRepository.update(id, updateCommentInput);
-    return this.commentsRepository.findOne({ where: { id } });
+    const comments = await this.commentsRepository.findOneBy({ id });
+    if (!comments) {
+      throw new Error('Comment not found');
+    }
+    Object.assign(comments, updateCommentInput);
+    return this.commentsRepository.save(comments);
   }
 
   async remove(id: number): Promise<Comment> {
     const comment = await this.findOne(id);
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
     await this.commentsRepository.remove(comment);
     return comment;
   }

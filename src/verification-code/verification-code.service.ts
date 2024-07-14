@@ -98,15 +98,21 @@ export class VerificationCodeService {
     id: number,
     updateVerificationCodeInput: UpdateVerificationCodeInput,
   ): Promise<VerificationCode> {
-    await this.verificationCodesRepository.update(
+    const verificationCode = await this.verificationCodesRepository.findOneBy({
       id,
-      updateVerificationCodeInput,
-    );
-    return this.verificationCodesRepository.findOne({ where: { id } });
+    });
+    if (!verificationCode) {
+      throw new BadRequestException('Verification code not found');
+    }
+    Object.assign(verificationCode, updateVerificationCodeInput);
+    return this.verificationCodesRepository.save(verificationCode);
   }
 
   async remove(id: number): Promise<VerificationCode> {
     const verificationCode = await this.findOne(id);
+    if (!verificationCode) {
+      throw new BadRequestException('Verification code not found');
+    }
     await this.verificationCodesRepository.remove(verificationCode);
     return verificationCode;
   }

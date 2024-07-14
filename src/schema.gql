@@ -195,7 +195,7 @@ type GqlVerificationCodesResponse {
 
 type Query {
   users: GqlUsersResponse!
-  user(id: Int!): User!
+  user(id: Int!): GqlUserResponse!
   tweets(page: Int! = 1, limit: Int! = 10): GqlTweetPaginationResponse!
   tweet(id: Int!): GqlTweetResponse!
   comments: GqlCommentsResponse!
@@ -211,9 +211,9 @@ type Query {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
+  createUser(createUserInput: CreateUserInput!): GqlUserResponse!
   updateUser(updateUserInput: UpdateUserInput!): GqlUserResponse!
-  removeUser(id: Int!): User!
+  removeUser(id: Int!): GqlUserResponse!
   createTweet(createTweetInput: CreateTweetInput!): GqlTweetResponse!
   updateTweet(updateTweetInput: UpdateTweetInput!): GqlTweetResponse!
   removeTweet(id: Int!): GqlTweetResponse!
@@ -228,7 +228,7 @@ type Mutation {
   removeFollow(id: Int!): GqlFollowResponse!
   createAttachment(createAttachmentInput: CreateAttachmentInput!): GqlAttachmentResponse!
   updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): GqlAttachmentResponse!
-  removeAttachment(id: Int!): Attachment!
+  removeAttachment(id: Int!): GqlAttachmentResponse!
   uploadFile(file: Upload!): String!
   createVerificationCode(user_id: Int!): GqlVerificationCodeResponse!
   verifyCode(user_id: Int!, code: String!): GqlVerifyCodeResponse!

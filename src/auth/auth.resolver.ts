@@ -8,7 +8,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SessionParam } from 'src/decorators/session.decorator';
 import { SessionService } from 'src/session/session.service';
-import { GqlUserResponse } from 'src/user/user.response';
+import { GqlUserResponse } from 'src/user/user.res';
 
 @Resolver()
 export class AuthResolver {

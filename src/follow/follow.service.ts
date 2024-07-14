@@ -51,12 +51,19 @@ export class FollowService {
     id: number,
     updateFollowInput: UpdateFollowInput,
   ): Promise<Follow> {
-    await this.followsRepository.update(id, updateFollowInput);
-    return this.followsRepository.findOne({ where: { id } });
+    const updatedFollow = await this.followsRepository.findOneBy({ id });
+    if (!updatedFollow) {
+      throw new Error('Follow not found');
+    }
+    Object.assign(updatedFollow, updateFollowInput);
+    return this.followsRepository.save(updatedFollow);
   }
 
   async remove(id: number): Promise<Follow> {
     const follow = await this.findOne(id);
+    if (!follow) {
+      throw new Error('Follow not found');
+    }
     await this.followsRepository.remove(follow);
     return follow;
   }

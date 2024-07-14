@@ -45,12 +45,20 @@ export class LikeService {
   }
 
   async update(id: number, updateLikeInput: UpdateLikeInput): Promise<Like> {
-    await this.likesRepository.update(id, updateLikeInput);
-    return this.likesRepository.findOne({ where: { id } });
+    const updateLike = await this.likesRepository.findOneBy({ id });
+    if (!updateLike) {
+      throw new Error('Like not found');
+    }
+    Object.assign(updateLike, updateLikeInput);
+    this.likesRepository.save(updateLike);
+    return updateLike;
   }
 
   async remove(id: number): Promise<Like> {
     const like = await this.findOne(id);
+    if (!like) {
+      throw new Error('Like not found');
+    }
     await this.likesRepository.remove(like);
     return like;
   }

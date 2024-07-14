@@ -7,32 +7,32 @@ import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import { IFile } from './file.type';
 import { uploadFileStream } from 'src/utils/upload';
 import {
-  GqlattAchmentResponse,
-  GqlattAchmentsResponse,
+  GqlAttAchmentResponse,
+  GqlAttAchmentsResponse,
 } from './attachment.res';
 
-@Resolver(() => GqlattAchmentResponse)
+@Resolver(() => GqlAttAchmentResponse)
 export class AttachmentResolver {
   constructor(private readonly attachmentService: AttachmentService) {}
 
-  @Mutation(() => GqlattAchmentResponse)
+  @Mutation(() => GqlAttAchmentResponse)
   createAttachment(
     @Args('createAttachmentInput') createAttachmentInput: CreateAttachmentInput,
   ) {
     return this.attachmentService.create(createAttachmentInput);
   }
 
-  @Query(() => GqlattAchmentsResponse, { name: 'attachments' })
+  @Query(() => GqlAttAchmentsResponse, { name: 'attachments' })
   findAll() {
     return this.attachmentService.findAll();
   }
 
-  @Query(() => GqlattAchmentResponse, { name: 'attachment' })
+  @Query(() => GqlAttAchmentResponse, { name: 'attachment' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.attachmentService.findOne(id);
   }
 
-  @Mutation(() => GqlattAchmentResponse)
+  @Mutation(() => GqlAttAchmentResponse)
   updateAttachment(
     @Args('updateAttachmentInput') updateAttachmentInput: UpdateAttachmentInput,
   ) {
@@ -42,7 +42,7 @@ export class AttachmentResolver {
     );
   }
 
-  @Mutation(() => Attachment)
+  @Mutation(() => GqlAttAchmentResponse)
   removeAttachment(@Args('id', { type: () => Int }) id: number) {
     return this.attachmentService.remove(id);
   }

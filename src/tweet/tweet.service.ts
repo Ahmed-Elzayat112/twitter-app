@@ -41,12 +41,21 @@ export class TweetService {
   }
 
   async update(id: number, updateTweetInput: UpdateTweetInput): Promise<Tweet> {
-    await this.tweetsRepository.update(id, updateTweetInput);
-    return this.tweetsRepository.findOne({ where: { id } });
+    const tweet = await this.tweetsRepository.findOneBy({ id });
+    if (!tweet) {
+      throw new Error('Tweet not found');
+    }
+
+    Object.assign(tweet, updateTweetInput);
+    await this.tweetsRepository.save(tweet);
+    return tweet;
   }
 
   async remove(id: number): Promise<Tweet> {
     const tweet = await this.findOne(id);
+    if (!tweet) {
+      throw new Error('Tweet not found');
+    }
     await this.tweetsRepository.remove(tweet);
     return tweet;
   }

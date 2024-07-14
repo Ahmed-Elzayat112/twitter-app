@@ -26,6 +26,7 @@ import {
   I18nModule,
   QueryResolver,
 } from 'nestjs-i18n';
+import { GraphQLError, GraphQLFormattedError } from 'graphql';
 
 @Module({
   imports: [
@@ -79,6 +80,26 @@ import {
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/schema.gql',
+      context: ({ req, res }) => ({ req, res }),
+      formatError: (error: GraphQLError): GraphQLFormattedError => {
+        const graphQLFormattedError: GraphQLFormattedError = {
+          message: error.message,
+          locations: error.locations,
+          path: error.path,
+          extensions: {
+            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+            timestamp: new Date().toISOString(),
+            path: error.path?.[0] || null,
+          },
+        };
+
+        // Remove stack trace in production
+        if (process.env.NODE_ENV === 'production') {
+          delete (graphQLFormattedError.extensions as any).exception;
+        }
+
+        return graphQLFormattedError;
+      },
     }),
 
     TypeOrmModule.forFeature(Object.values(entities)),
