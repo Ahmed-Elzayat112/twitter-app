@@ -98,8 +98,17 @@ type GqlTweetResponse {
   message: String!
 }
 
-type GqlTweetsResponse {
+type PageInfo {
+  currentPage: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  totalCount: Int!
+  totalPages: Int!
+}
+
+type GqlTweetPaginationResponse {
   data: [Tweet!]!
+  pageInfo: PageInfo!
   status: String!
   message: String!
 }
@@ -187,7 +196,7 @@ type GqlVerificationCodesResponse {
 type Query {
   users: GqlUsersResponse!
   user(id: Int!): User!
-  tweets: GqlTweetsResponse!
+  tweets(page: Int! = 1, limit: Int! = 10): GqlTweetPaginationResponse!
   tweet(id: Int!): GqlTweetResponse!
   comments: GqlCommentsResponse!
   comment(id: Int!): GqlCommentResponse!

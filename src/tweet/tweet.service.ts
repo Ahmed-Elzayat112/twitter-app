@@ -5,6 +5,7 @@ import { Tweet } from './entities/tweet.entity';
 import { CreateTweetInput } from './dtos/create-tweet.input';
 import { UpdateTweetInput } from './dtos/update-tweet.input';
 import { UserService } from 'src/user/user.service';
+import { paginate } from 'src/utils/pagination.utils';
 
 @Injectable()
 export class TweetService {
@@ -30,8 +31,9 @@ export class TweetService {
     return this.tweetsRepository.save(newTweet);
   }
 
-  findAll(): Promise<Tweet[]> {
-    return this.tweetsRepository.find();
+  async findAll(page: number, limit: number) {
+    const query = this.tweetsRepository.createQueryBuilder('tweet');
+    return paginate(query, page, limit);
   }
 
   findOne(id: number): Promise<Tweet> {

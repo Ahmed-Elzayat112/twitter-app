@@ -3,7 +3,11 @@ import { TweetService } from './tweet.service';
 import { Tweet } from './entities/tweet.entity';
 import { CreateTweetInput } from './dtos/create-tweet.input';
 import { UpdateTweetInput } from './dtos/update-tweet.input';
-import { GqlTweetResponse, GqlTweetsResponse } from './tweet.res';
+import {
+  GqlTweetResponse,
+  GqlTweetsResponse,
+  TweetPaginationResponse,
+} from './tweet.res';
 
 @Resolver(() => Tweet)
 export class TweetResolver {
@@ -14,9 +18,28 @@ export class TweetResolver {
     return this.tweetService.create(createTweetInput);
   }
 
-  @Query(() => GqlTweetsResponse, { name: 'tweets' })
-  findAll() {
-    return this.tweetService.findAll();
+  @Query(() => TweetPaginationResponse)
+  async tweets(
+    @Args('page', { type: () => Int, defaultValue: 1 }) page: number,
+    @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
+  ) {
+    const { items, totalCount, totalPages } = await this.tweetService.findAll(
+      page,
+      limit,
+    );
+
+    return {
+      data: items,
+      pageInfo: {
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+        totalCount,
+        totalPages,
+      },
+      status: 'success',
+      message: 'Tweets retrieved successfully',
+    };
   }
 
   @Query(() => GqlTweetResponse, { name: 'tweet' })
