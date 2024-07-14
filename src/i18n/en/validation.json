@@ -1,3 +1,5 @@
 {
-  "INVALID_EMAIL": "Invalid email address"
+  "INVALID_EMAIL": "Invalid email address",
+  "USERNAME_INVALID": "Invalid username",
+  "INVALID_STRING": "Invalid input, should be a string"
 }

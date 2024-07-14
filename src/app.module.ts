@@ -31,7 +31,7 @@ import {
   imports: [
     I18nModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        fallbackLanguage: configService.getOrThrow('FALLBACK_LANGUAGE'),
+        fallbackLanguage: configService.get<string>('FALLBACK_LANGUAGE'),
         loaderOptions: {
           path: join(__dirname, '/i18n/'),
           watch: true,

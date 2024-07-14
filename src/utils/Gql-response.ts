@@ -1,28 +1,28 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ClassType } from 'type-graphql';
 
+@ObjectType()
+abstract class PageInfo implements IPageInfo {
+  @Field(() => Int)
+  currentPage: number;
+
+  @Field()
+  hasNextPage: boolean;
+
+  @Field()
+  hasPreviousPage: boolean;
+
+  @Field(() => Int)
+  totalCount: number;
+
+  @Field(() => Int)
+  totalPages: number;
+}
+
 export function generateGqlResponse<TItem extends object>(
   TItemClass: ClassType<TItem> | ClassType<TItem>[],
   isRaw: boolean = false,
 ) {
-  @ObjectType()
-  abstract class PageInfo implements IPageInfo {
-    @Field(() => Int)
-    currentPage: number;
-
-    @Field()
-    hasNextPage: boolean;
-
-    @Field()
-    hasPreviousPage: boolean;
-
-    @Field(() => Int)
-    totalCount: number;
-
-    @Field(() => Int)
-    totalPages: number;
-  }
-
   if (Array.isArray(TItemClass)) {
     if (isRaw) {
       @ObjectType(`Gql${TItemClass[0].name}sResponse`)
@@ -42,9 +42,9 @@ export function generateGqlResponse<TItem extends object>(
     }
 
     @ObjectType(`Gql${TItemClass[0].name}PaginationResponse`)
-    abstract class GqlResponse {
+    abstract class GqlResponse implements IPaginationResponse<TItem> {
       @Field((type) => [TItemClass[0]])
-      data: TItem;
+      data: TItem[];
 
       @Field(() => PageInfo)
       pageInfo: PageInfo;
@@ -59,7 +59,7 @@ export function generateGqlResponse<TItem extends object>(
     return GqlResponse;
   } else {
     @ObjectType(`Gql${TItemClass.name}Response`)
-    abstract class GqlResponse {
+    abstract class GqlResponse implements IRespone<TItem> {
       // Runtime argument
       @Field((type) => TItemClass)
       data: TItem;
@@ -89,6 +89,6 @@ interface IPageInfo {
 }
 
 interface IPaginationResponse<T> {
-  items: T[];
+  data: T[];
   pageInfo: IPageInfo;
 }

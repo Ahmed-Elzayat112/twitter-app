@@ -80,6 +80,14 @@ type User {
   sessions: [Session!]!
 }
 
+type PageInfo {
+  currentPage: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  totalCount: Int!
+  totalPages: Int!
+}
+
 type GqlUserResponse {
   data: User!
   status: String!
@@ -96,14 +104,6 @@ type GqlTweetResponse {
   data: Tweet!
   status: String!
   message: String!
-}
-
-type PageInfo {
-  currentPage: Int!
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  totalCount: Int!
-  totalPages: Int!
 }
 
 type GqlTweetPaginationResponse {

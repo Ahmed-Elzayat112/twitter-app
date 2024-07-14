@@ -35,6 +35,7 @@ export class VerificationCodeResolver {
         user_id,
         code,
       );
+
       const message = this.i18n.translate('errors.VERIFICATION_SUCCESS', {
         lang: I18nContext.current().lang,
       });

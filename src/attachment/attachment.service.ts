@@ -41,24 +41,6 @@ export class AttachmentService {
     return this.attachmentRepository.save(attachment);
   }
 
-  /*
-    async create(createTweetInput: CreateTweetInput): Promise<Tweet> {
-    const { content, user_id } = createTweetInput;
-
-    const user = await this.usersService.findOne(user_id);
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const newTweet = this.tweetsRepository.create({
-      content,
-      user,
-    });
-    return this.tweetsRepository.save(newTweet);
-  }
-  */
-
   findAll(): Promise<Attachment[]> {
     return this.attachmentRepository.find({ relations: ['tweet', 'user'] });
   }
