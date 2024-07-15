@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+  Context,
+} from '@nestjs/graphql';
 import { TweetService } from './tweet.service';
 import { Tweet } from './entities/tweet.entity';
 import { CreateTweetInput } from './dtos/create-tweet.input';
@@ -8,6 +17,8 @@ import {
   GqlTweetsResponse,
   TweetPaginationResponse,
 } from './tweet.res';
+import { User } from 'src/entities';
+import { DataloaderService } from 'src/dataloader/dataloader.service';
 
 @Resolver(() => Tweet)
 export class TweetResolver {
@@ -45,6 +56,19 @@ export class TweetResolver {
   @Query(() => GqlTweetResponse, { name: 'tweet' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.tweetService.findOne(id);
+  }
+
+  @ResolveField(() => User, {
+    name: 'user',
+    description: 'User who created the tweet',
+    nullable: true,
+  })
+  getUser(
+    @Parent() tweet: Tweet,
+    @Context()
+    { loaders }: { loaders: ReturnType<DataloaderService['createLoaders']> },
+  ) {
+    return loaders.usersLoader.load(tweet.user.id);
   }
 
   @Mutation(() => GqlTweetResponse)

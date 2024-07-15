@@ -13,40 +13,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as entities from './entities';
-import path, { join } from 'path';
+import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { SessionModule } from './session/session.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './interceptors/response.interceptor';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
-import {
-  AcceptLanguageResolver,
-  CookieResolver,
-  HeaderResolver,
-  I18nModule,
-  QueryResolver,
-} from 'nestjs-i18n';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
+import { DataloaderModule } from './dataloader/dataloader.module';
+import { DataloaderService } from './dataloader/dataloader.service';
 
 @Module({
   imports: [
-    I18nModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        fallbackLanguage: configService.get<string>('FALLBACK_LANGUAGE'),
-        loaderOptions: {
-          path: join(__dirname, '/i18n/'),
-          watch: true,
-        },
-      }),
-      resolvers: [
-        new QueryResolver(['lang', 'l']),
-        new HeaderResolver(['x-custom-lang']),
-        new CookieResolver(),
-        AcceptLanguageResolver,
-      ],
-      inject: [ConfigService],
-    }),
-
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
@@ -77,33 +55,35 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql';
       },
     }),
 
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: 'src/schema.gql',
-      context: ({ req, res }) => ({ req, res }),
-      formatError: (error: GraphQLError): GraphQLFormattedError => {
-        const graphQLFormattedError: GraphQLFormattedError = {
-          message: error.message,
-          locations: error.locations,
-          path: error.path,
-          extensions: {
-            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
-            timestamp: new Date().toISOString(),
-            path: error.path?.[0] || null,
+      imports: [DataloaderModule],
+      useFactory: (dataloaderService: DataloaderService) => {
+        return {
+          autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+          context: ({ req, res }) => ({
+            req,
+            res,
+            loaders: dataloaderService.createLoaders(),
+          }),
+          formatError: (error: GraphQLError): GraphQLFormattedError => {
+            const graphQLFormattedError: GraphQLFormattedError = {
+              message: error.message,
+              locations: error.locations,
+              path: error.path,
+              extensions: {
+                code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+                timestamp: new Date().toISOString(),
+                path: error.path?.[0] || null,
+              },
+            };
+            return graphQLFormattedError;
           },
         };
-
-        // Remove stack trace in production
-        if (process.env.NODE_ENV === 'production') {
-          delete (graphQLFormattedError.extensions as any).exception;
-        }
-
-        return graphQLFormattedError;
       },
+      inject: [DataloaderService],
     }),
-
     TypeOrmModule.forFeature(Object.values(entities)),
-
     UserModule,
     TweetModule,
     CommentModule,
@@ -113,6 +93,7 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql';
     VerificationCodeModule,
     AuthModule,
     SessionModule,
+    DataloaderModule,
   ],
   providers: [
     {

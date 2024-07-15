@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
-import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 

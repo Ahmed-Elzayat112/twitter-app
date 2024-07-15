@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
@@ -28,6 +28,22 @@ export class UserService {
 
   findOneByEmail(email: string): Promise<User> {
     return this.usersRepository.findOne({ where: { email } });
+  }
+
+  async findUsersByBatch(usersIds: number[]): Promise<(User | Error)[]> {
+    console.debug(`Loading ids ${usersIds}`);
+
+    // Query to find owners by batch
+    const users = await this.usersRepository.findBy({ id: In(usersIds) });
+
+    // Map the results to maintain the order and handle missing owners
+    const mappedResults = usersIds.map(
+      (id) =>
+        users.find((user) => user.id === id) ||
+        new Error(`Could not load owner ${id}`),
+    );
+
+    return mappedResults;
   }
 
   async update(id: number, updateUserInput: UpdateUserInput): Promise<User> {

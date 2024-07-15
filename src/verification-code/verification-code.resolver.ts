@@ -8,13 +8,11 @@ import {
   VerifyCodeResponse,
 } from './verification.res';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { I18nContext, I18nService } from 'nestjs-i18n';
 
 @Resolver(() => VerificationCode)
 export class VerificationCodeResolver {
   constructor(
     private readonly verificationCodeService: VerificationCodeService,
-    private readonly i18n: I18nService,
   ) {}
 
   @Mutation(() => GqlVerificationCodeResponse)

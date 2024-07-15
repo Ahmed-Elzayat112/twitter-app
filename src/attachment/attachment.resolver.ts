@@ -3,7 +3,7 @@ import { AttachmentService } from './attachment.service';
 import { Attachment } from './entities/attachment.entity';
 import { CreateAttachmentInput } from './dtos/create-attachment.input';
 import { UpdateAttachmentInput } from './dtos/update-attachment.input';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import { IFile } from './file.type';
 import { uploadFileStream } from 'src/utils/upload';
 import {
