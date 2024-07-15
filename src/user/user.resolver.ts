@@ -36,11 +36,11 @@ export class UserResolver {
   }
 
   @ResolveField(() => [Tweet], {
-    name: 'tweet',
-    description: 'tweets that created by this user',
+    name: 'tweets',
+    description: 'tweets created by this user',
     nullable: true,
   })
-  getTweet(
+  getTweets(
     @Parent() user: User,
     @Context()
     { loaders }: { loaders: ReturnType<DataloaderService['createLoaders']> },

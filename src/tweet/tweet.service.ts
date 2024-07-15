@@ -39,15 +39,17 @@ export class TweetService {
   async findTweetsByBatch(tweetsIds: number[]): Promise<(Tweet | Error)[]> {
     console.debug(`Loading ids ${tweetsIds}`);
 
-    // Query to find owners by batch
-    const users = await this.tweetsRepository.findBy({ id: In(tweetsIds) });
+    // Query to find tweets by batch
+    const tweets = await this.tweetsRepository.findBy({ id: In(tweetsIds) });
 
-    // Map the results to maintain the order and handle missing owners
+    // Map the results to maintain the order and handle missing tweets
     const mappedResults = tweetsIds.map(
       (id) =>
-        users.find((tweet) => tweet.id === id) ||
-        new Error(`Could not load owner ${id}`),
+        tweets.find((tweet) => tweet.id === id) ||
+        new Error(`Could not load tweet ${id}`),
     );
+
+    console.log(mappedResults);
 
     return mappedResults;
   }

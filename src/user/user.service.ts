@@ -31,17 +31,20 @@ export class UserService {
   }
 
   async findUsersByBatch(usersIds: number[]): Promise<(User | Error)[]> {
-    console.debug(`Loading ids ${usersIds}`);
+    // console.debug(`Loading ids ${usersIds}`);
 
-    // Query to find owners by batch
+    // Query to find users by batch
     const users = await this.usersRepository.findBy({ id: In(usersIds) });
+    console.log(users);
 
-    // Map the results to maintain the order and handle missing owners
+    // Map the results to maintain the order and handle missing users
     const mappedResults = usersIds.map(
       (id) =>
         users.find((user) => user.id === id) ||
-        new Error(`Could not load owner ${id}`),
+        new Error(`Could not load users ${id}`),
     );
+
+    console.log(mappedResults);
 
     return mappedResults;
   }

@@ -9,4 +9,5 @@ export const enErrors = {
   STRING_MAX_MIN: 'Max length is 50 and Min length is 5',
   DATE_INVALID: 'Invalid date format',
   USERNAME_EXIST: 'Username already exists',
+  Unauthorized: 'User is not authorized',
 };
