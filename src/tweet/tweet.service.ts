@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Tweet } from './entities/tweet.entity';
 import { CreateTweetInput } from './dtos/create-tweet.input';
 import { UpdateTweetInput } from './dtos/update-tweet.input';
@@ -34,6 +34,22 @@ export class TweetService {
   async findAll(page: number, limit: number) {
     const query = this.tweetsRepository.createQueryBuilder('tweet');
     return paginate(query, page, limit);
+  }
+
+  async findTweetsByBatch(tweetsIds: number[]): Promise<(Tweet | Error)[]> {
+    console.debug(`Loading ids ${tweetsIds}`);
+
+    // Query to find owners by batch
+    const users = await this.tweetsRepository.findBy({ id: In(tweetsIds) });
+
+    // Map the results to maintain the order and handle missing owners
+    const mappedResults = tweetsIds.map(
+      (id) =>
+        users.find((tweet) => tweet.id === id) ||
+        new Error(`Could not load owner ${id}`),
+    );
+
+    return mappedResults;
   }
 
   findOne(id: number): Promise<Tweet> {

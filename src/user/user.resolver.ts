@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+  Context,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/common/gql-auth.guard';
 import { UserService } from './user.service';
@@ -6,6 +15,8 @@ import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
 import { GqlUserResponse, GqlUsersResponse } from './user.res';
+import { Tweet } from 'src/entities';
+import { DataloaderService } from 'src/dataloader/dataloader.service';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -22,6 +33,20 @@ export class UserResolver {
   @UseGuards(GqlAuthGuard)
   findAll() {
     return this.userService.findAll();
+  }
+
+  @ResolveField(() => [Tweet], {
+    name: 'tweet',
+    description: 'tweets that created by this user',
+    nullable: true,
+  })
+  getTweet(
+    @Parent() user: User,
+    @Context()
+    { loaders }: { loaders: ReturnType<DataloaderService['createLoaders']> },
+  ) {
+    const { id: userId } = user;
+    return loaders.tweetsLoader.load(userId);
   }
 
   @Query(() => GqlUserResponse, { name: 'user' })

@@ -80,6 +80,9 @@ type User {
   comments: [Comment!]
   attachments: [Attachment!]
   sessions: [Session!]!
+
+  """tweets that created by this user"""
+  tweet: [Tweet!]
 }
 
 type PageInfo {

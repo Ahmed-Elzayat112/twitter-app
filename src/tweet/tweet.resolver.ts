@@ -68,7 +68,8 @@ export class TweetResolver {
     @Context()
     { loaders }: { loaders: ReturnType<DataloaderService['createLoaders']> },
   ) {
-    return loaders.usersLoader.load(tweet.user.id);
+    const { id: tweetId } = tweet;
+    return loaders.usersLoader.load(tweetId);
   }
 
   @Mutation(() => GqlTweetResponse)
