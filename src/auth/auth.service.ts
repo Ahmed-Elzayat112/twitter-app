@@ -11,6 +11,7 @@ import { User } from 'src/entities';
 import { VerificationCodeService } from 'src/verification-code/verification-code.service';
 import { ConfigService } from '@nestjs/config';
 import { SessionService } from 'src/session/session.service';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly verificationCodeService: VerificationCodeService,
     private readonly configService: ConfigService,
     private readonly sessionService: SessionService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async createJwtToken(user: User) {
@@ -93,10 +95,19 @@ export class AuthService {
       verified: false,
     };
 
-    const user = await this.userService.create(newUser);
+    // TODO: should we make this transaction? user can be created but not sending code
 
-    await this.verificationCodeService.create(user.id); // TODO: should we make this transaction? user can be created but not sending code
-    return user;
+    return this.dataSource.manager.transaction(
+      async (transactionalEntityManager) => {
+        const user = await this.userService.create(newUser);
+        await transactionalEntityManager.save(user);
+        const verificationCode = await this.verificationCodeService.create(
+          user.id,
+        );
+        await transactionalEntityManager.save(verificationCode);
+        return user;
+      },
+    );
   }
 
   async login(email: string, password: string) {
