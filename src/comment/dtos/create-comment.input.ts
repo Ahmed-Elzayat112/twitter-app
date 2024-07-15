@@ -1,17 +1,25 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsDate, IsString, Max, Min } from 'class-validator';
-import { i18nValidationMessage } from 'nestjs-i18n';
+import {
+  IsDate,
+  IsOptional,
+  IsString,
+  Length,
+  Max,
+  Min,
+} from 'class-validator';
+import { CreateDateColumn } from 'typeorm';
 
 @InputType()
 export class CreateCommentInput {
-  @Max(50)
-  @Min(5)
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  @Length(5, 50, { message: 'STRING_MAX_MIN' })
+  @IsString({ message: 'INVALID_STRING' })
   @Field()
   content: string;
 
-  @IsDate()
-  @Field()
+  @IsOptional()
+  @IsDate({ message: 'DATE_INVALID' })
+  // @Field()
+  @CreateDateColumn()
   created_at: Date;
 
   @Field()

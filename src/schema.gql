@@ -106,9 +106,13 @@ type GqlTweetResponse {
   message: String!
 }
 
-type GqlTweetPaginationResponse {
-  data: [Tweet!]!
+type GqlTweetItemsResponse {
+  items: [Tweet!]!
   pageInfo: PageInfo!
+}
+
+type GqlTweetPaginationResponse {
+  data: GqlTweetItemsResponse!
   status: String!
   message: String!
 }
@@ -272,14 +276,12 @@ input UpdateTweetInput {
 
 input CreateCommentInput {
   content: String!
-  created_at: DateTime!
   tweet_id: Float!
   user_id: Float!
 }
 
 input UpdateCommentInput {
   content: String
-  created_at: DateTime
   tweet_id: Float
   user_id: Float
   id: Int!

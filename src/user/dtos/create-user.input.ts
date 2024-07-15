@@ -1,17 +1,24 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsBoolean, IsEmail, IsString, IsUrl, Length } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+} from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
 @InputType()
 export class CreateUserInput {
   @Length(5, 20, {
-    message: i18nValidationMessage('validation.USERNAME_INVALID'),
+    message: 'INVALID_STRING',
   })
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  @IsString({ message: 'INVALID_STRING' })
   @Field()
   username: string;
 
-  @IsEmail({}, { message: i18nValidationMessage('validation.INVALID_EMAIL') })
+  @IsEmail({}, { message: 'INVALID_EMAIL' })
   @Field()
   email: string;
 
@@ -22,11 +29,18 @@ export class CreateUserInput {
   @Field({ defaultValue: false })
   verified: boolean;
 
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  @IsOptional()
+  @IsString({ message: 'INVALID_STRING' })
   @Field({ nullable: true })
   bio?: string;
 
-  @IsUrl({}, { message: i18nValidationMessage('validation.INVALID_URL') })
+  @IsOptional()
+  @IsUrl(
+    {},
+    {
+      message: 'INVALID_URL',
+    },
+  )
   @Field({ nullable: true })
   profile_picture?: string;
 }

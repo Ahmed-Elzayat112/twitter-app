@@ -12,9 +12,10 @@ export class UserService {
     private usersRepository: Repository<User>,
   ) {}
 
-  create(createUserInput: CreateUserInput): Promise<User> {
+  async create(createUserInput: CreateUserInput): Promise<User> {
     const newUser = this.usersRepository.create(createUserInput);
-    return this.usersRepository.save(newUser);
+    const user = await this.usersRepository.save(newUser);
+    return user;
   }
 
   findAll(): Promise<User[]> {

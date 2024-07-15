@@ -35,21 +35,14 @@ export class VerificationCodeResolver {
         user_id,
         code,
       );
-
-      const message = this.i18n.translate('errors.VERIFICATION_SUCCESS', {
-        lang: I18nContext.current().lang,
-      });
-
+      const message = 'VERIFICATION_FAILURE';
       return {
         data: { verified },
         status: 'success',
         message,
       };
     } catch (error) {
-      const message = this.i18n.t('errors.VERIFICATION_FAILURE', {
-        lang: I18nContext.current().lang,
-      });
-
+      const message = 'VERIFICATION_FAILURE';
       throw new HttpException(
         {
           statusCode: HttpStatus.BAD_REQUEST,

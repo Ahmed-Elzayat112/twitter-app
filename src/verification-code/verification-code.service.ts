@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { VerificationCode } from './entities/verification-code.entity';
 import { CreateVerificationCodeInput } from './dtos/create-verification-code.input';
 import { UpdateVerificationCodeInput } from './dtos/update-verification-code.input';
@@ -17,7 +17,10 @@ export class VerificationCodeService {
     private readonly userService: UserService,
   ) {}
 
-  async create(user_id: number): Promise<VerificationCode> {
+  async create(
+    user_id: number,
+    manager?: EntityManager,
+  ): Promise<VerificationCode> {
     const user = await this.userService.findOne(user_id);
     const code = Math.random().toString(36).substring(2, 8);
     const created_at = new Date();

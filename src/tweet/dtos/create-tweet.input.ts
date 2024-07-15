@@ -1,12 +1,9 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsString, Max, Min } from 'class-validator';
-import { i18nValidationMessage } from 'nestjs-i18n';
+import { IsString } from 'class-validator';
 
 @InputType()
 export class CreateTweetInput {
-  @Max(100)
-  @Min(5)
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  @IsString({ message: 'INVALID_STRING' })
   @Field()
   content: string;
 

@@ -29,7 +29,7 @@ export function generateGqlResponse<TItem extends object>(
       abstract class GqlResponse {
         // Runtime argument
         @Field((type) => [TItemClass[0]])
-        data: TItem;
+        data: TItem[];
 
         @Field()
         status: string;
@@ -39,24 +39,28 @@ export function generateGqlResponse<TItem extends object>(
       }
 
       return GqlResponse;
+    } else {
+      @ObjectType(`Gql${TItemClass[0].name}ItemsResponse`)
+      abstract class GqlPaginationRespone {
+        @Field((type) => [TItemClass[0]])
+        items: TItem[];
+
+        @Field(() => PageInfo)
+        pageInfo: PageInfo;
+      }
+      @ObjectType(`Gql${TItemClass[0].name}PaginationResponse`)
+      abstract class GqlResponse {
+        @Field((type) => GqlPaginationRespone)
+        data: GqlPaginationRespone;
+
+        @Field(() => String)
+        status: string;
+
+        @Field(() => String)
+        message: string;
+      }
+      return GqlResponse;
     }
-
-    @ObjectType(`Gql${TItemClass[0].name}PaginationResponse`)
-    abstract class GqlResponse implements IPaginationResponse<TItem> {
-      @Field((type) => [TItemClass[0]])
-      data: TItem[];
-
-      @Field(() => PageInfo)
-      pageInfo: PageInfo;
-
-      @Field(() => String)
-      status: string;
-
-      @Field(() => String)
-      message: string;
-    }
-
-    return GqlResponse;
   } else {
     @ObjectType(`Gql${TItemClass.name}Response`)
     abstract class GqlResponse implements IRespone<TItem> {
@@ -86,9 +90,4 @@ interface IPageInfo {
   currentPage: number;
   totalPages: number;
   totalCount: number;
-}
-
-interface IPaginationResponse<T> {
-  data: T[];
-  pageInfo: IPageInfo;
 }

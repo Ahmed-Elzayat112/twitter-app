@@ -28,8 +28,10 @@ export class TweetResolver {
       limit,
     );
 
+    console.log(items);
+
     return {
-      data: items,
+      items,
       pageInfo: {
         currentPage: page,
         hasNextPage: page < totalPages,
@@ -37,8 +39,6 @@ export class TweetResolver {
         totalCount,
         totalPages,
       },
-      status: 'success',
-      message: 'Tweets retrieved successfully',
     };
   }
 

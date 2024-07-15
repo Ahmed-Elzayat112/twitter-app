@@ -12,8 +12,10 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Mutation(() => GqlUserResponse)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.userService.create(createUserInput);
+  async createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+    const user = await this.userService.create(createUserInput);
+    console.log(user);
+    return user;
   }
 
   @Query(() => GqlUsersResponse, { name: 'users' })
