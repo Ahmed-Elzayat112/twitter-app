@@ -11,6 +11,7 @@ import { User } from 'src/entities';
 import { VerificationCodeService } from 'src/verification-code/verification-code.service';
 import { ConfigService } from '@nestjs/config';
 import { SessionService } from 'src/session/session.service';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly verificationCodeService: VerificationCodeService,
     private readonly configService: ConfigService,
     private readonly sessionService: SessionService,
+    private readonly i18n: I18nService,
   ) {}
 
   async createJwtToken(user: User) {
@@ -76,7 +78,10 @@ export class AuthService {
     const userExists = await this.userService.findOneByEmail(email);
 
     if (userExists && userExists.verified) {
-      throw new BadRequestException('email already exists');
+      const message = this.i18n.t('errors.EXIST_EMAIL', {
+        lang: I18nContext.current().lang,
+      });
+      throw new BadRequestException({ message });
     }
 
     if (userExists && userExists.verified === false) {

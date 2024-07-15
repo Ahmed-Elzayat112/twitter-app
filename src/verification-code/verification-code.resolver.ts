@@ -49,6 +49,7 @@ export class VerificationCodeResolver {
       const message = this.i18n.t('errors.VERIFICATION_FAILURE', {
         lang: I18nContext.current().lang,
       });
+
       throw new HttpException(
         {
           statusCode: HttpStatus.BAD_REQUEST,

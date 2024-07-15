@@ -1,4 +1,5 @@
 {
   "VERIFICATION_SUCCESS": "تم التحقق بنجاح",
-  "VERIFICATION_FAILURE": "فشل التحقق"
+  "VERIFICATION_FAILURE": "فشل التحقق",
+  "EXIST_EMAIL": "هذا الحساب مستخدم"
 }
