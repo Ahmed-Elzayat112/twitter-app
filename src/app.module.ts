@@ -22,6 +22,8 @@ import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { DataloaderModule } from './dataloader/dataloader.module';
 import { DataloaderService } from './dataloader/dataloader.service';
+import { BullModule } from '@nestjs/bullmq';
+import { MailProcessor } from './mail.processor';
 
 @Module({
   imports: [
@@ -33,6 +35,18 @@ import { DataloaderService } from './dataloader/dataloader.service';
         index: false,
       },
     }),
+
+    // we should install something here
+
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    // BullModule.registerQueue({
+    //   name: 'email',
+    // }),
 
     ConfigModule.forRoot({
       isGlobal: true,
@@ -105,6 +119,7 @@ import { DataloaderService } from './dataloader/dataloader.service';
       useClass: HttpExceptionFilter,
     },
     AppService,
+    MailProcessor,
   ],
 })
 export class AppModule {}

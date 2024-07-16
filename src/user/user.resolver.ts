@@ -40,13 +40,15 @@ export class UserResolver {
     description: 'tweets created by this user',
     nullable: true,
   })
-  getTweets(
+  async getTweets(
     @Parent() user: User,
     @Context()
     { loaders }: { loaders: ReturnType<DataloaderService['createLoaders']> },
   ) {
     const { id: userId } = user;
-    return loaders.tweetsLoader.load(userId);
+    const tweets = await loaders.tweetsLoader.load(userId);
+    console.log(tweets);
+    return tweets;
   }
 
   @Query(() => GqlUserResponse, { name: 'user' })

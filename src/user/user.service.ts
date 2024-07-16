@@ -30,7 +30,7 @@ export class UserService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
-  async findUsersByBatch(usersIds: number[]): Promise<(User | Error)[]> {
+  async findUsersByBatch(usersIds: number[]): Promise<(User | null)[]> {
     // console.debug(`Loading ids ${usersIds}`);
 
     // Query to find users by batch
@@ -39,9 +39,7 @@ export class UserService {
 
     // Map the results to maintain the order and handle missing users
     const mappedResults = usersIds.map(
-      (id) =>
-        users.find((user) => user.id === id) ||
-        new Error(`Could not load users ${id}`),
+      (id) => users.find((user) => user.id === id) || null,
     );
 
     console.log(mappedResults);

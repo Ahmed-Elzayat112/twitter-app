@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { VerificationCode } from './entities/verification-code.entity';
 import { CreateVerificationCodeInput } from './dtos/create-verification-code.input';
 import { UpdateVerificationCodeInput } from './dtos/update-verification-code.input';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { UserService } from 'src/user/user.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class VerificationCodeService {
@@ -15,12 +17,10 @@ export class VerificationCodeService {
     private verificationCodesRepository: Repository<VerificationCode>,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
+    @InjectQueue('email') private readonly emailQueue: Queue,
   ) {}
 
-  async create(
-    user_id: number,
-    manager?: EntityManager,
-  ): Promise<VerificationCode> {
+  async create(user_id: number): Promise<VerificationCode> {
     const user = await this.userService.findOne(user_id);
     const code = Math.random().toString(36).substring(2, 8);
     const created_at = new Date();
@@ -40,28 +40,10 @@ export class VerificationCodeService {
     const createdVerificationCode =
       await this.verificationCodesRepository.save(newVerificationCode);
 
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: this.configService.get<'string'>('EMAIL_USER'),
-        pass: this.configService.get<'string'>('EMAIL_PASSWORD'),
-      },
-    });
-
-    const mailOptions = {
-      from: this.configService.get<'string'>('EMAIL_USER'),
-      to: user.email,
-      subject: 'Verification Code',
-      text: `Your verification code is: ${code}`,
-    };
-
-    transporter.sendMail(mailOptions, (error: any, info: { response: any }) => {
-      if (error) {
-        console.error('Error sending email:', error);
-      } else {
-        console.log('Email sent:', info.response);
-      }
+    // Queue the email sending job
+    await this.emailQueue.add('sendMail', {
+      email: user.email,
+      code: code,
     });
 
     return createdVerificationCode;

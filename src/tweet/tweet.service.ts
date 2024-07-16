@@ -36,7 +36,7 @@ export class TweetService {
     return paginate(query, page, limit);
   }
 
-  async findTweetsByBatch(tweetsIds: number[]): Promise<(Tweet | Error)[]> {
+  async findTweetsByBatch(tweetsIds: number[]): Promise<(Tweet | null)[]> {
     console.debug(`Loading ids ${tweetsIds}`);
 
     // Query to find tweets by batch
@@ -44,9 +44,7 @@ export class TweetService {
 
     // Map the results to maintain the order and handle missing tweets
     const mappedResults = tweetsIds.map(
-      (id) =>
-        tweets.find((tweet) => tweet.id === id) ||
-        new Error(`Could not load tweet ${id}`),
+      (id) => tweets.find((tweet) => tweet.id === id) || null,
     );
 
     console.log(mappedResults);
