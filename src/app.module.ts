@@ -18,7 +18,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { SessionModule } from './session/session.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './interceptors/response.interceptor';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { GqlHttpExceptionFilter } from './filters/http-exception.filter';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { DataloaderModule } from './dataloader/dataloader.module';
 import { DataloaderService } from './dataloader/dataloader.service';
@@ -116,7 +116,7 @@ import { MailProcessor } from './mail.processor';
     },
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: GqlHttpExceptionFilter,
     },
     AppService,
     MailProcessor,

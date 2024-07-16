@@ -15,7 +15,6 @@ export class VerificationCodeService {
   constructor(
     @InjectRepository(VerificationCode)
     private verificationCodesRepository: Repository<VerificationCode>,
-    private readonly configService: ConfigService,
     private readonly userService: UserService,
     @InjectQueue('email') private readonly emailQueue: Queue,
   ) {}
@@ -45,6 +44,8 @@ export class VerificationCodeService {
       email: user.email,
       code: code,
     });
+
+    // console.log(this.emailQueue);
 
     return createdVerificationCode;
   }

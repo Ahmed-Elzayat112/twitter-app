@@ -18,8 +18,9 @@ export class AuthResolver {
   ) {}
 
   @UseGuards(AuthGuard('refresh'))
-  @Mutation(() => String)
+  @Mutation(() => SignUserResponse)
   async refreshToken(@SessionParam() { id }: Session) {
+    // console.log(id);
     return this.authService.createAccessToken(id);
   }
 
@@ -36,9 +37,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => GqlSignUserResponse)
-  async login(
-    @Args('signUserInput') signUserInput: SignUserInput,
-  ): Promise<SignUserResponse> {
+  async login(@Args('signUserInput') signUserInput: SignUserInput) {
     const { email, password } = signUserInput;
     return this.authService.login(email, password);
   }

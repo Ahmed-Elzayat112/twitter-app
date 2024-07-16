@@ -19,7 +19,7 @@ export class DataloaderService {
     );
     const tweetsLoader = new DataLoader<number, Tweet>(
       async (keys: readonly number[]) =>
-        this.tweetService.findTweetsByBatch(keys as number[]),
+        await this.tweetService.findTweetsByBatch(keys as number[]),
     );
     return {
       usersLoader,

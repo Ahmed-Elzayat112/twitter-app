@@ -242,7 +242,7 @@ type Mutation {
   verifyCode(user_id: Int!, code: String!): GqlVerifyCodeResponse!
   updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): GqlVerificationCodeResponse!
   removeVerificationCode(id: Int!): GqlVerificationCodeResponse!
-  refreshToken: String!
+  refreshToken: SignUserResponse!
   logout: Boolean!
   signup(createUserInput: CreateUserInput!): GqlUserResponse!
   login(signUserInput: SignUserInput!): GqlSignUserResponseResponse!

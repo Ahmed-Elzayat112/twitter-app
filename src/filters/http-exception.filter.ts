@@ -5,13 +5,13 @@ import { enErrors } from 'src/translation/enErrors';
 import { arErrors } from 'src/translation/arErrors';
 
 @Catch()
-export class HttpExceptionFilter
+export class GqlHttpExceptionFilter
   implements ExceptionFilter, GqlExceptionFilter
 {
   constructor() {}
-  private readonly logger = new Logger(HttpExceptionFilter.name);
+  private readonly logger = new Logger(GqlHttpExceptionFilter.name);
   catch(exception: any, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
+    // const ctx = host.switchToHttp();
     // const response = ctx.getResponse<Response>();
     // const request = ctx.getRequest<Request>();
     // const context = gqlHost.getContext();
@@ -20,14 +20,17 @@ export class HttpExceptionFilter
     const gqlHost = GqlArgumentsHost.create(host);
     const request = gqlHost.getContext().req;
 
-    const lang = request.headers['lang'];
+    const lang = request.headers['lang'] || 'en';
     let errors = lang === 'ar' ? arErrors : enErrors;
 
     let message = 'Internal server error';
     let status = 500;
 
-    const res = exception.getResponse();
-    status = exception.getStatus();
+    const res = gqlHost.getContext().res;
+
+    if (res && typeof res.status === 'function') {
+      status = res.status();
+    }
     message = errors[res.message];
 
     message = typeof res === 'string' ? res : message;

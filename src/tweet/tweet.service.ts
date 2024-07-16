@@ -36,18 +36,16 @@ export class TweetService {
     return paginate(query, page, limit);
   }
 
-  async findTweetsByBatch(tweetsIds: number[]): Promise<(Tweet | null)[]> {
-    console.debug(`Loading ids ${tweetsIds}`);
+  async findTweetsByBatch(usersIds: number[]): Promise<(Tweet | any)[]> {
+    console.debug(`Loading ids ${usersIds}`);
 
     // Query to find tweets by batch
-    const tweets = await this.tweetsRepository.findBy({ id: In(tweetsIds) });
+    const tweets = await this.tweetsRepository.findBy({ id: In(usersIds) });
 
     // Map the results to maintain the order and handle missing tweets
-    const mappedResults = tweetsIds.map(
-      (id) => tweets.find((tweet) => tweet.id === id) || null,
+    const mappedResults = usersIds.map(
+      (id) => tweets.filter((tweet) => tweet.id === id) || null,
     );
-
-    console.log(mappedResults);
 
     return mappedResults;
   }

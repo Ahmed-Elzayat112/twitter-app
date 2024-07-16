@@ -17,6 +17,7 @@ import { UpdateUserInput } from './dtos/update-user.input';
 import { GqlUserResponse, GqlUsersResponse } from './user.res';
 import { Tweet } from 'src/entities';
 import { DataloaderService } from 'src/dataloader/dataloader.service';
+import { IDataloaders } from 'src/dataloader/data-loaders.interface';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -43,11 +44,10 @@ export class UserResolver {
   async getTweets(
     @Parent() user: User,
     @Context()
-    { loaders }: { loaders: ReturnType<DataloaderService['createLoaders']> },
+    { loaders }: { loaders: IDataloaders },
   ) {
     const { id: userId } = user;
     const tweets = await loaders.tweetsLoader.load(userId);
-    console.log(tweets);
     return tweets;
   }
 
