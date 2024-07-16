@@ -6,6 +6,8 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Tweet } from '../../tweet/entities/tweet.entity';
 import { Follow } from '../../follow/entities/follow.entity';
@@ -15,6 +17,7 @@ import { Comment } from '../../comment/entities/comment.entity';
 import { Attachment } from '../../attachment/entities/attachment.entity';
 import { pathFinderMiddleware } from 'src/middlewares/pathFinderMiddleware';
 import { Session } from 'src/entities/session.entity';
+import { Role } from 'src/role/role.entity';
 
 @ObjectType()
 @Entity()
@@ -77,4 +80,9 @@ export class User {
   @Field(() => [Session])
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
+
+  @Field(() => [Role])
+  @ManyToMany(() => Role, (role) => role.users, { eager: true })
+  @JoinTable()
+  roles: Role[];
 }

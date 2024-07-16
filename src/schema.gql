@@ -66,6 +66,19 @@ type Session {
   user_id: Int!
 }
 
+type Permission {
+  id: Int!
+  name: String!
+  roles: [Role!]
+}
+
+type Role {
+  id: Int!
+  name: String!
+  permissions: [Permission!]
+  users: [User!]
+}
+
 type User {
   id: Int!
   username: String!
@@ -82,6 +95,7 @@ type User {
   comments: [Comment!]
   attachments: [Attachment!]
   sessions: [Session!]!
+  roles: [Role!]!
 }
 
 type PageInfo {
@@ -117,6 +131,18 @@ type GqlTweetItemsResponse {
 
 type GqlTweetPaginationResponse {
   data: GqlTweetItemsResponse!
+  status: String!
+  message: String!
+}
+
+type GqlPermissionResponse {
+  data: Permission!
+  status: String!
+  message: String!
+}
+
+type GqlPermissionsResponse {
+  data: [Permission!]!
   status: String!
   message: String!
 }
@@ -201,11 +227,25 @@ type GqlVerificationCodesResponse {
   message: String!
 }
 
+type GqlRoleResponse {
+  data: Role!
+  status: String!
+  message: String!
+}
+
+type GqlRolesResponse {
+  data: [Role!]!
+  status: String!
+  message: String!
+}
+
 type Query {
   users: GqlUsersResponse!
   user(id: Int!): GqlUserResponse!
   tweets(page: Int! = 1, limit: Int! = 10): GqlTweetPaginationResponse!
   tweet(id: Int!): GqlTweetResponse!
+  permissions: GqlPermissionsResponse!
+  permissionsForUser(userId: Int!): [String!]!
   comments: GqlCommentsResponse!
   comment(id: Int!): GqlCommentResponse!
   likes: GqlLikesResponse!
@@ -216,6 +256,7 @@ type Query {
   attachment(id: Int!): GqlAttachmentResponse!
   verificationCodes: GqlVerificationCodesResponse!
   verificationCode(id: Int!): GqlVerificationCodeResponse!
+  roles: GqlRolesResponse!
 }
 
 type Mutation {
@@ -225,6 +266,7 @@ type Mutation {
   createTweet(createTweetInput: CreateTweetInput!): GqlTweetResponse!
   updateTweet(updateTweetInput: UpdateTweetInput!): GqlTweetResponse!
   removeTweet(id: Int!): GqlTweetResponse!
+  createPermission(createPermissionInput: CreatePermissionInput!): GqlPermissionResponse!
   createComment(createCommentInput: CreateCommentInput!): GqlCommentResponse!
   updateComment(updateCommentInput: UpdateCommentInput!): GqlCommentResponse!
   removeComment(id: Int!): GqlCommentResponse!
@@ -246,6 +288,7 @@ type Mutation {
   logout: Boolean!
   signup(createUserInput: CreateUserInput!): GqlUserResponse!
   login(signUserInput: SignUserInput!): GqlSignUserResponseResponse!
+  createRole(createRoleInput: CreateRoleInput!): GqlRoleResponse!
 }
 
 input CreateUserInput {
@@ -255,6 +298,7 @@ input CreateUserInput {
   verified: Boolean! = false
   bio: String
   profile_picture: String
+  roleIds: [Int!]
 }
 
 input UpdateUserInput {
@@ -264,6 +308,7 @@ input UpdateUserInput {
   verified: Boolean = false
   bio: String
   profile_picture: String
+  roleIds: [Int!]
   id: Int!
 }
 
@@ -276,6 +321,10 @@ input UpdateTweetInput {
   content: String
   user_id: Float
   id: Int!
+}
+
+input CreatePermissionInput {
+  name: String!
 }
 
 input CreateCommentInput {
@@ -356,4 +405,9 @@ input SignUserInput {
   password: String!
   bio: String
   profile_picture: String
+}
+
+input CreateRoleInput {
+  name: String!
+  permissionIds: [Float!]!
 }

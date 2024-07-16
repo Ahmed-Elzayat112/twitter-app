@@ -4,16 +4,21 @@ import { In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
+import { Role } from 'src/role/role.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Role) private roleRepository: Repository<Role>,
   ) {}
 
   async create(createUserInput: CreateUserInput): Promise<User> {
-    const newUser = this.usersRepository.create(createUserInput);
+    const roles = await this.roleRepository.findBy({
+      id: In(createUserInput.roleIds),
+    });
+    const newUser = this.usersRepository.create({ ...createUserInput, roles });
     const user = await this.usersRepository.save(newUser);
     return user;
   }

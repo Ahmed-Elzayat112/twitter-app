@@ -24,6 +24,8 @@ import { DataloaderModule } from './dataloader/dataloader.module';
 import { DataloaderService } from './dataloader/dataloader.service';
 import { BullModule } from '@nestjs/bullmq';
 import { MailProcessor } from './mail.processor';
+import { PermissionModule } from './permission/permission.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -108,6 +110,8 @@ import { MailProcessor } from './mail.processor';
     AuthModule,
     SessionModule,
     DataloaderModule,
+    PermissionModule,
+    RoleModule,
   ],
   providers: [
     {

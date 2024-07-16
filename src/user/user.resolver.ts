@@ -9,14 +9,13 @@ import {
   Context,
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from 'src/common/gql-auth.guard';
+import { GqlAuthGuard } from 'src/common/guards/gql-auth.guard';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
 import { GqlUserResponse, GqlUsersResponse } from './user.res';
 import { Tweet } from 'src/entities';
-import { DataloaderService } from 'src/dataloader/dataloader.service';
 import { IDataloaders } from 'src/dataloader/data-loaders.interface';
 
 @Resolver(() => User)
