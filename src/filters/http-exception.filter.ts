@@ -1,46 +1,54 @@
-import { ExceptionFilter, Catch, ArgumentsHost, Logger } from '@nestjs/common';
-import { GqlArgumentsHost, GqlExceptionFilter } from '@nestjs/graphql';
-import { ApolloError } from 'apollo-server-errors';
-import { enErrors } from 'src/translation/enErrors';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
+import { GqlArgumentsHost } from '@nestjs/graphql';
+import { ApolloError } from 'apollo-server-express';
 import { arErrors } from 'src/translation/arErrors';
+import { enErrors } from 'src/translation/enErrors';
 
 @Catch()
-export class GqlHttpExceptionFilter
-  implements ExceptionFilter, GqlExceptionFilter
-{
-  constructor() {}
+export class GqlHttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GqlHttpExceptionFilter.name);
+
   catch(exception: any, host: ArgumentsHost) {
-    // const ctx = host.switchToHttp();
-    // const response = ctx.getResponse<Response>();
-    // const request = ctx.getRequest<Request>();
-    // const context = gqlHost.getContext();
-    // const response = gqlHost.getContext().res;
-
     const gqlHost = GqlArgumentsHost.create(host);
-    const request = gqlHost.getContext().req;
+    const context = gqlHost.getContext();
+    const request = context.req;
+    const response = context.res;
 
-    const lang = request.headers['lang'] || 'en';
-    let errors = lang === 'ar' ? arErrors : enErrors;
-
+    // Extract the error message and status
     let message = 'Internal server error';
-    let status = 500;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const res = gqlHost.getContext().res;
-
-    if (res && typeof res.status === 'function') {
-      status = res.status();
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const response = exception.getResponse();
+      message =
+        typeof response === 'string'
+          ? response
+          : (response as any).message || message;
+    } else if (exception.message) {
+      message = exception.message;
     }
-    message = errors[res.message];
 
-    message = typeof res === 'string' ? res : message;
+    // Get the language from the request headers
+    const lang = request.headers['lang'];
+    const errors = lang === 'ar' ? arErrors : enErrors; // Assume arErrors and enErrors are defined elsewhere
+
+    // Translate the error message if applicable
+    message = errors[message] || message;
 
     this.logger.error(`Status: ${status}, Error: ${JSON.stringify(exception)}`);
 
     // Return a GraphQL-friendly error without exposing the stack trace
-    return new ApolloError(message, `${status}`, {
+    throw new ApolloError(message, `${status}`, {
       timestamp: new Date().toISOString(),
-      path: request ? request.url : null,
+      path: request.url,
       code: `${status}`,
     });
   }
