@@ -39,14 +39,14 @@ export class UserService {
 
     // Query to find users by batch
     const users = await this.usersRepository.findBy({ id: In(usersIds) });
-    console.log(users);
+    // console.log(users);
 
     // Map the results to maintain the order and handle missing users
     const mappedResults = usersIds.map(
       (id) => users.find((user) => user.id === id) || null,
     );
 
-    console.log(mappedResults);
+    // console.log(mappedResults);
 
     return mappedResults;
   }
@@ -58,7 +58,7 @@ export class UserService {
     }
     Object.assign(user, updateUserInput);
     const userUpdated = await this.usersRepository.save(user);
-    console.log(userUpdated);
+    // console.log(userUpdated);
     return userUpdated;
   }
 

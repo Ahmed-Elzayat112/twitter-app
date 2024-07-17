@@ -25,7 +25,7 @@ export class UserResolver {
   @Mutation(() => GqlUserResponse)
   async createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
     const user = await this.userService.create(createUserInput);
-    console.log(user);
+    // console.log(user);
     return user;
   }
 

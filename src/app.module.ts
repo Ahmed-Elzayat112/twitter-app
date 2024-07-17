@@ -27,6 +27,7 @@ import { MailProcessor } from './mail.processor';
 import { RoleModule } from './role/role.module';
 import { UserService } from './user/user.service';
 import { AuthService } from './auth/auth.service';
+import { GraphqlConfigService } from './configs/graphql.config';
 
 @Module({
   imports: [
@@ -70,58 +71,10 @@ import { AuthService } from './auth/auth.service';
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       imports: [DataloaderModule, UserModule, AuthModule],
-      useFactory: (
-        dataloaderService: DataloaderService,
-        userService: UserService,
-        authService: AuthService,
-      ) => {
-        return {
-          autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-          context: async ({ req, res }) => {
-            let currentUser = null;
-
-            // Extract JWT token or any other authentication mechanism from headers
-            const authHeader = req.headers.authorization;
-            if (authHeader && authHeader.startsWith('Bearer ')) {
-              const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-
-              try {
-                // Decode or verify JWT token to get user information
-                const decodedToken = await authService.validateToken(token);
-                // console.log('------------------> decoded', decodedToken);
-                if (decodedToken) {
-                  // Fetch user information based on decoded token
-                  currentUser = await userService.findOne(decodedToken.userId);
-                  // console.log('-------------------> current user', currentUser);
-                }
-              } catch (error) {
-                console.error('Error verifying token:', error.message);
-              }
-            }
-            return {
-              req,
-              res,
-              loaders: dataloaderService.createLoaders(),
-              user: currentUser,
-            };
-          },
-          formatError: (error: GraphQLError): GraphQLFormattedError => {
-            const graphQLFormattedError: GraphQLFormattedError = {
-              message: error.message,
-              locations: error.locations,
-              path: error.path,
-              extensions: {
-                code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
-                timestamp: new Date().toISOString(),
-                path: error.path?.[0] || null,
-              },
-            };
-            return graphQLFormattedError;
-          },
-        };
-      },
-      inject: [DataloaderService, UserService, AuthService],
+      useClass: GraphqlConfigService,
+      inject: [GraphqlConfigService],
     }),
+
     TypeOrmModule.forFeature(Object.values(entities)),
     UserModule,
     TweetModule,

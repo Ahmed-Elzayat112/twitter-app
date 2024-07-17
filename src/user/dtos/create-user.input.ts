@@ -44,5 +44,5 @@ export class CreateUserInput {
   profile_picture?: string;
 
   @Field({ nullable: true })
-  role_id?: number;
+  roleId?: number;
 }

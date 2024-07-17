@@ -6,8 +6,6 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
-  ManyToMany,
-  JoinTable,
   ManyToOne,
 } from 'typeorm';
 import { Tweet } from '../../tweet/entities/tweet.entity';
@@ -82,11 +80,12 @@ export class User {
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
-  // @Field({ nullable: true })
-  // @Column({ nullable: true })
-  // roleId?: number;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  roleId?: number;
 
   @Field(() => Role)
   @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  @JoinColumn({ name: 'roleId' })
   role: Role;
 }
