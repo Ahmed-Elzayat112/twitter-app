@@ -8,6 +8,7 @@ import {
   JoinColumn,
   ManyToMany,
   JoinTable,
+  ManyToOne,
 } from 'typeorm';
 import { Tweet } from '../../tweet/entities/tweet.entity';
 import { Follow } from '../../follow/entities/follow.entity';
@@ -81,8 +82,11 @@ export class User {
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
-  @Field(() => [Role])
-  @ManyToMany(() => Role, (role) => role.users, { eager: true })
-  @JoinTable()
-  roles: Role[];
+  // @Field({ nullable: true })
+  // @Column({ nullable: true })
+  // roleId?: number;
+
+  @Field(() => Role)
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  role: Role;
 }

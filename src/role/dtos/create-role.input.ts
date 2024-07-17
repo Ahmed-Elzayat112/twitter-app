@@ -5,6 +5,6 @@ export class CreateRoleInput {
   @Field()
   name: string;
 
-  @Field(() => [Number])
-  permissionIds: number[];
+  @Field(() => [String])
+  permissions: string[];
 }

@@ -73,6 +73,20 @@ export class AuthService {
     return null;
   }
 
+  async validateToken(token: string): Promise<{ userId: number } | null> {
+    try {
+      const payload = await this.jwtService.verifyAsync(token);
+      // console.log('----------------------> payload', payload);
+      const session = await this.sessionService.get(payload.id);
+      const userId = session.user_id;
+      // console.log('----------------->', userId);
+      return { userId };
+    } catch (error) {
+      console.error('Error verifying token:', error.message);
+      return null;
+    }
+  }
+
   async signup(createUserInput: CreateUserInput): Promise<User> {
     const { email } = createUserInput;
     const userExists = await this.userService.findOneByEmail(email);
@@ -110,7 +124,7 @@ export class AuthService {
     );
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, context: any) {
     const user = await this.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -119,6 +133,9 @@ export class AuthService {
     if (!user.verified) {
       throw new UnauthorizedException('Account not verified');
     }
+
+    context.req.user = user; // Set the user in the request context
+    console.log(context.req.user);
 
     return this.createJwtToken(user);
   }

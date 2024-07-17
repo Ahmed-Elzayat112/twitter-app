@@ -1,4 +1,4 @@
-export enum Permissions {
+export const enum Permissions {
   READ_TWEETS = 'read_tweets',
   WRITE_TWEETS = 'write_tweets',
   DELETE_TWEETS = 'delete_tweets',

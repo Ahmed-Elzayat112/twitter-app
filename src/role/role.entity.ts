@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
-import { Permission } from '../permission/permission.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { User } from 'src/entities';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Int } from 'type-graphql';
@@ -21,14 +14,11 @@ export class Role {
   @Column()
   name: string;
 
-  @Field(() => [Permission], { nullable: true })
-  @ManyToMany(() => Permission, (permission) => permission.roles, {
-    eager: true,
-  })
-  @JoinTable()
-  permissions?: Permission[];
+  @Field(() => [String], { nullable: true })
+  @Column('simple-array', { nullable: true })
+  permissions?: string[];
 
   @Field(() => [User], { nullable: true })
-  @ManyToMany(() => User, (user) => user.roles)
+  @OneToMany(() => User, (user) => user.role)
   users: User[];
 }

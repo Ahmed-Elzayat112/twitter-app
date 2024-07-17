@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
@@ -15,10 +15,9 @@ export class UserService {
   ) {}
 
   async create(createUserInput: CreateUserInput): Promise<User> {
-    const roles = await this.roleRepository.findBy({
-      id: In(createUserInput.roleIds),
-    });
-    const newUser = this.usersRepository.create({ ...createUserInput, roles });
+    const newUser = this.usersRepository.create(
+      createUserInput as DeepPartial<User>,
+    );
     const user = await this.usersRepository.save(newUser);
     return user;
   }
@@ -57,9 +56,10 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-
     Object.assign(user, updateUserInput);
-    return this.usersRepository.save(user);
+    const userUpdated = await this.usersRepository.save(user);
+    console.log(userUpdated);
+    return userUpdated;
   }
 
   async remove(id: number): Promise<User> {

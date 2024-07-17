@@ -88,6 +88,7 @@ export class VerificationCodeService {
     if (!verificationCode) {
       throw new BadRequestException('Verification code not found');
     }
+
     Object.assign(verificationCode, updateVerificationCodeInput);
     return this.verificationCodesRepository.save(verificationCode);
   }

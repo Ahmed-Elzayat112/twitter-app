@@ -66,16 +66,10 @@ type Session {
   user_id: Int!
 }
 
-type Permission {
-  id: Int!
-  name: String!
-  roles: [Role!]
-}
-
 type Role {
   id: Int!
   name: String!
-  permissions: [Permission!]
+  permissions: [String!]
   users: [User!]
 }
 
@@ -95,7 +89,7 @@ type User {
   comments: [Comment!]
   attachments: [Attachment!]
   sessions: [Session!]!
-  roles: [Role!]!
+  role: Role!
 }
 
 type PageInfo {
@@ -135,14 +129,14 @@ type GqlTweetPaginationResponse {
   message: String!
 }
 
-type GqlPermissionResponse {
-  data: Permission!
+type GqlRoleResponse {
+  data: Role!
   status: String!
   message: String!
 }
 
-type GqlPermissionsResponse {
-  data: [Permission!]!
+type GqlRolesResponse {
+  data: [Role!]!
   status: String!
   message: String!
 }
@@ -227,49 +221,43 @@ type GqlVerificationCodesResponse {
   message: String!
 }
 
-type GqlRoleResponse {
-  data: Role!
-  status: String!
-  message: String!
-}
-
-type GqlRolesResponse {
-  data: [Role!]!
-  status: String!
-  message: String!
-}
-
 type Query {
   users: GqlUsersResponse!
   user(id: Int!): GqlUserResponse!
   tweets(page: Int! = 1, limit: Int! = 10): GqlTweetPaginationResponse!
   tweet(id: Int!): GqlTweetResponse!
-  permissions: GqlPermissionsResponse!
-  permissionsForUser(userId: Int!): [String!]!
+  roles: GqlRolesResponse!
   comments: GqlCommentsResponse!
   comment(id: Int!): GqlCommentResponse!
+  verificationCodes: GqlVerificationCodesResponse!
+  verificationCode(id: Int!): GqlVerificationCodeResponse!
   likes: GqlLikesResponse!
   like(id: Int!): GqlLikeResponse!
   follows: GqlFollowsResponse!
   follow(id: Int!): GqlFollowResponse!
   attachments: GqlAttachmentsResponse!
   attachment(id: Int!): GqlAttachmentResponse!
-  verificationCodes: GqlVerificationCodesResponse!
-  verificationCode(id: Int!): GqlVerificationCodeResponse!
-  roles: GqlRolesResponse!
 }
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): GqlUserResponse!
   updateUser(updateUserInput: UpdateUserInput!): GqlUserResponse!
   removeUser(id: Int!): GqlUserResponse!
+  refreshToken: SignUserResponse!
+  logout: Boolean!
+  signup(createUserInput: CreateUserInput!): GqlUserResponse!
+  login(signUserInput: SignUserInput!): GqlSignUserResponseResponse!
   createTweet(createTweetInput: CreateTweetInput!): GqlTweetResponse!
   updateTweet(updateTweetInput: UpdateTweetInput!): GqlTweetResponse!
   removeTweet(id: Int!): GqlTweetResponse!
-  createPermission(createPermissionInput: CreatePermissionInput!): GqlPermissionResponse!
+  createRole(createRoleInput: CreateRoleInput!): GqlRoleResponse!
   createComment(createCommentInput: CreateCommentInput!): GqlCommentResponse!
   updateComment(updateCommentInput: UpdateCommentInput!): GqlCommentResponse!
   removeComment(id: Int!): GqlCommentResponse!
+  createVerificationCode(user_id: Int!): GqlVerificationCodeResponse!
+  verifyCode(user_id: Int!, code: String!): GqlVerifyCodeResponse!
+  updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): GqlVerificationCodeResponse!
+  removeVerificationCode(id: Int!): GqlVerificationCodeResponse!
   createLike(createLikeInput: CreateLikeInput!): GqlLikeResponse!
   updateLike(updateLikeInput: UpdateLikeInput!): GqlLikeResponse!
   removeLike(id: Int!): GqlLikeResponse!
@@ -280,15 +268,6 @@ type Mutation {
   updateAttachment(updateAttachmentInput: UpdateAttachmentInput!): GqlAttachmentResponse!
   removeAttachment(id: Int!): GqlAttachmentResponse!
   uploadFile(file: Upload!): String!
-  createVerificationCode(user_id: Int!): GqlVerificationCodeResponse!
-  verifyCode(user_id: Int!, code: String!): GqlVerifyCodeResponse!
-  updateVerificationCode(updateVerificationCodeInput: UpdateVerificationCodeInput!): GqlVerificationCodeResponse!
-  removeVerificationCode(id: Int!): GqlVerificationCodeResponse!
-  refreshToken: SignUserResponse!
-  logout: Boolean!
-  signup(createUserInput: CreateUserInput!): GqlUserResponse!
-  login(signUserInput: SignUserInput!): GqlSignUserResponseResponse!
-  createRole(createRoleInput: CreateRoleInput!): GqlRoleResponse!
 }
 
 input CreateUserInput {
@@ -298,7 +277,7 @@ input CreateUserInput {
   verified: Boolean! = false
   bio: String
   profile_picture: String
-  roleIds: [Int!]
+  role_id: Float
 }
 
 input UpdateUserInput {
@@ -308,8 +287,15 @@ input UpdateUserInput {
   verified: Boolean = false
   bio: String
   profile_picture: String
-  roleIds: [Int!]
+  role_id: Float
   id: Int!
+}
+
+input SignUserInput {
+  email: String!
+  password: String!
+  bio: String
+  profile_picture: String
 }
 
 input CreateTweetInput {
@@ -323,8 +309,9 @@ input UpdateTweetInput {
   id: Int!
 }
 
-input CreatePermissionInput {
+input CreateRoleInput {
   name: String!
+  permissions: [String!]!
 }
 
 input CreateCommentInput {
@@ -336,6 +323,14 @@ input CreateCommentInput {
 input UpdateCommentInput {
   content: String
   tweet_id: Float
+  user_id: Float
+  id: Int!
+}
+
+input UpdateVerificationCodeInput {
+  code: String
+  created_at: DateTime
+  expire_at: DateTime
   user_id: Float
   id: Int!
 }
@@ -391,23 +386,3 @@ input UpdateAttachmentInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
-
-input UpdateVerificationCodeInput {
-  code: String
-  created_at: DateTime
-  expire_at: DateTime
-  user_id: Float
-  id: Int!
-}
-
-input SignUserInput {
-  email: String!
-  password: String!
-  bio: String
-  profile_picture: String
-}
-
-input CreateRoleInput {
-  name: String!
-  permissionIds: [Float!]!
-}

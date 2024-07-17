@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { CreateUserInput } from 'src/user/dtos/create-user.input';
 import { AuthService } from './auth.service';
 import { Session, User } from 'src/entities';
@@ -37,8 +37,11 @@ export class AuthResolver {
   }
 
   @Mutation(() => GqlSignUserResponse)
-  async login(@Args('signUserInput') signUserInput: SignUserInput) {
+  async login(
+    @Args('signUserInput') signUserInput: SignUserInput,
+    @Context() context: any,
+  ) {
     const { email, password } = signUserInput;
-    return this.authService.login(email, password);
+    return this.authService.login(email, password, context); // there is a problem in graphql feild
   }
 }

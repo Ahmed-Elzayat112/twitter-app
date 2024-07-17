@@ -7,7 +7,6 @@ import {
   IsUrl,
   Length,
 } from 'class-validator';
-import { Int } from 'type-graphql';
 
 @InputType()
 export class CreateUserInput {
@@ -44,6 +43,6 @@ export class CreateUserInput {
   @Field({ nullable: true })
   profile_picture?: string;
 
-  @Field(() => [Int], { nullable: true })
-  roleIds?: number[];
+  @Field({ nullable: true })
+  role_id?: number;
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TweetModule } from './tweet/tweet.module';
@@ -24,8 +24,9 @@ import { DataloaderModule } from './dataloader/dataloader.module';
 import { DataloaderService } from './dataloader/dataloader.service';
 import { BullModule } from '@nestjs/bullmq';
 import { MailProcessor } from './mail.processor';
-import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
+import { UserService } from './user/user.service';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -38,17 +39,12 @@ import { RoleModule } from './role/role.module';
       },
     }),
 
-    // we should install something here
-
     BullModule.forRoot({
       connection: {
         host: 'localhost',
         port: 6379,
       },
     }),
-    // BullModule.registerQueue({
-    //   name: 'email',
-    // }),
 
     ConfigModule.forRoot({
       isGlobal: true,
@@ -73,15 +69,42 @@ import { RoleModule } from './role/role.module';
 
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [DataloaderModule],
-      useFactory: (dataloaderService: DataloaderService) => {
+      imports: [DataloaderModule, UserModule, AuthModule],
+      useFactory: (
+        dataloaderService: DataloaderService,
+        userService: UserService,
+        authService: AuthService,
+      ) => {
         return {
           autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-          context: ({ req, res }) => ({
-            req,
-            res,
-            loaders: dataloaderService.createLoaders(),
-          }),
+          context: async ({ req, res }) => {
+            let currentUser = null;
+
+            // Extract JWT token or any other authentication mechanism from headers
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+              const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
+              try {
+                // Decode or verify JWT token to get user information
+                const decodedToken = await authService.validateToken(token);
+                // console.log('------------------> decoded', decodedToken);
+                if (decodedToken) {
+                  // Fetch user information based on decoded token
+                  currentUser = await userService.findOne(decodedToken.userId);
+                  // console.log('-------------------> current user', currentUser);
+                }
+              } catch (error) {
+                console.error('Error verifying token:', error.message);
+              }
+            }
+            return {
+              req,
+              res,
+              loaders: dataloaderService.createLoaders(),
+              user: currentUser,
+            };
+          },
           formatError: (error: GraphQLError): GraphQLFormattedError => {
             const graphQLFormattedError: GraphQLFormattedError = {
               message: error.message,
@@ -97,7 +120,7 @@ import { RoleModule } from './role/role.module';
           },
         };
       },
-      inject: [DataloaderService],
+      inject: [DataloaderService, UserService, AuthService],
     }),
     TypeOrmModule.forFeature(Object.values(entities)),
     UserModule,
@@ -109,8 +132,6 @@ import { RoleModule } from './role/role.module';
     VerificationCodeModule,
     AuthModule,
     SessionModule,
-    DataloaderModule,
-    PermissionModule,
     RoleModule,
   ],
   providers: [

@@ -12,31 +12,29 @@ import { TweetService } from './tweet.service';
 import { Tweet } from './entities/tweet.entity';
 import { CreateTweetInput } from './dtos/create-tweet.input';
 import { UpdateTweetInput } from './dtos/update-tweet.input';
-import {
-  GqlTweetResponse,
-  GqlTweetsResponse,
-  TweetPaginationResponse,
-} from './tweet.res';
+import { GqlTweetResponse, TweetPaginationResponse } from './tweet.res';
 import { User } from 'src/entities';
 import { DataloaderService } from 'src/dataloader/dataloader.service';
 import { UseGuards } from '@nestjs/common';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { PermissionsDecorator } from 'src/decorators/permissions.decorator';
-import { Permissions } from 'src/permission/permissions.enum';
+import { hasPermissions } from 'src/decorators/permissions.decorator';
+import { Permissions } from 'src/role/Permissions.enum';
+import { GqlAuthGuard } from 'src/common/guards/gql-auth.guard';
 
 @Resolver(() => Tweet)
+@UseGuards(GqlAuthGuard)
 @UseGuards(PermissionsGuard)
 export class TweetResolver {
   constructor(private readonly tweetService: TweetService) {}
 
   @Mutation(() => GqlTweetResponse)
-  @PermissionsDecorator(Permissions.WRITE_TWEETS)
+  @hasPermissions(Permissions.WRITE_TWEETS)
   createTweet(@Args('createTweetInput') createTweetInput: CreateTweetInput) {
     return this.tweetService.create(createTweetInput);
   }
 
   @Query(() => TweetPaginationResponse)
-  @PermissionsDecorator(Permissions.READ_TWEETS)
+  @hasPermissions(Permissions.READ_TWEETS)
   async tweets(
     @Args('page', { type: () => Int, defaultValue: 1 }) page: number,
     @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
@@ -45,8 +43,6 @@ export class TweetResolver {
       page,
       limit,
     );
-
-    console.log(items);
 
     return {
       items,
@@ -85,7 +81,7 @@ export class TweetResolver {
   }
 
   @Mutation(() => GqlTweetResponse)
-  @PermissionsDecorator(Permissions.DELETE_TWEETS)
+  @hasPermissions(Permissions.DELETE_TWEETS)
   removeTweet(@Args('id', { type: () => Int }) id: number) {
     return this.tweetService.remove(id);
   }
