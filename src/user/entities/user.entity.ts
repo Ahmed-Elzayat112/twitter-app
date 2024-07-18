@@ -88,4 +88,9 @@ export class User {
   @ManyToOne(() => Role, (role) => role.users, { eager: true })
   @JoinColumn({ name: 'roleId' })
   role: Role;
+
+  @Column({
+    default: 'ACTIVE',
+  })
+  status: string;
 }

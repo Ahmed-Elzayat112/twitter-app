@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { VerificationCode } from './entities/verification-code.entity';
 import { CreateVerificationCodeInput } from './dtos/create-verification-code.input';
 import { UpdateVerificationCodeInput } from './dtos/update-verification-code.input';
-import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
 import { UserService } from 'src/user/user.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';

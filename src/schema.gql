@@ -66,6 +66,23 @@ type Session {
   user_id: Int!
 }
 
+type NotificationToken {
+  id: Int!
+  user: User!
+  device_type: String!
+  notification_token: String!
+  status: String!
+}
+
+type Notifications {
+  id: Int!
+  notification_token: NotificationToken!
+  title: String!
+  body: String!
+  created_by: String!
+  status: String!
+}
+
 type Role {
   id: Int!
   name: String!
@@ -109,6 +126,24 @@ type GqlUserResponse {
 
 type GqlUsersResponse {
   data: [User!]!
+  status: String!
+  message: String!
+}
+
+type GqlNotificationTokenResponse {
+  data: NotificationToken!
+  status: String!
+  message: String!
+}
+
+type GqlNotificationsResponse {
+  data: Notifications!
+  status: String!
+  message: String!
+}
+
+type GqlNotificationTokensResponse {
+  data: [NotificationToken!]!
   status: String!
   message: String!
 }
@@ -225,6 +260,7 @@ type GqlVerificationCodesResponse {
 type Query {
   users: GqlUsersResponse!
   user(id: Int!): GqlUserResponse!
+  notifications: GqlNotificationTokensResponse!
   tweets(page: Int! = 1, limit: Int! = 10): GqlTweetPaginationResponse!
   tweet(id: Int!): GqlTweetResponse!
   roles: GqlRolesResponse!
@@ -244,10 +280,13 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): GqlUserResponse!
   updateUser(updateUserInput: UpdateUserInput!): GqlUserResponse!
   removeUser(id: Int!): GqlUserResponse!
+  enablePush(createNotificationInput: CreateNotificationInput!, userId: Float!): GqlNotificationTokenResponse!
+  disablePush(id: Float!, updateNotificationInput: UpdateNotificationInput!): GqlNotificationTokenResponse!
   refreshToken: SignUserResponse!
   logout: Boolean!
   signup(createUserInput: CreateUserInput!): GqlUserResponse!
   login(signUserInput: SignUserInput!): GqlSignUserResponseResponse!
+  sendPush(userId: Float!, title: String!, body: String!): GqlNotificationsResponse!
   createTweet(createTweetInput: CreateTweetInput!): GqlTweetResponse!
   updateTweet(updateTweetInput: UpdateTweetInput!): GqlTweetResponse!
   removeTweet(id: Int!): GqlTweetResponse!
@@ -289,6 +328,19 @@ input UpdateUserInput {
   bio: String
   profile_picture: String
   roleId: Float
+  id: Int!
+}
+
+input CreateNotificationInput {
+  device_type: String!
+  notification_token: String!
+  status: String! = "ACTIVE"
+}
+
+input UpdateNotificationInput {
+  device_type: String
+  notification_token: String
+  status: String = "ACTIVE"
   id: Int!
 }
 

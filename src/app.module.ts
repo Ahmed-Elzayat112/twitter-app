@@ -19,15 +19,12 @@ import { SessionModule } from './session/session.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './interceptors/response.interceptor';
 import { GqlHttpExceptionFilter } from './filters/http-exception.filter';
-import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { DataloaderModule } from './dataloader/dataloader.module';
-import { DataloaderService } from './dataloader/dataloader.service';
 import { BullModule } from '@nestjs/bullmq';
-import { MailProcessor } from './mail.processor';
+import { MailProcessor } from './workers/mail.processor';
 import { RoleModule } from './role/role.module';
-import { UserService } from './user/user.service';
-import { AuthService } from './auth/auth.service';
 import { GraphqlConfigService } from './configs/graphql.config';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -86,6 +83,7 @@ import { GraphqlConfigService } from './configs/graphql.config';
     AuthModule,
     SessionModule,
     RoleModule,
+    NotificationModule,
   ],
   providers: [
     {

@@ -5,13 +5,17 @@ import { User } from './entities/user.entity';
 import { CreateUserInput } from './dtos/create-user.input';
 import { UpdateUserInput } from './dtos/update-user.input';
 import { Role } from 'src/role/role.entity';
+import { NotificationService } from 'src/notification/notification.service';
+import { CreateNotificationInput } from 'src/notification/dtos/create-notification.dto';
+import { UpdateNotificationInput } from 'src/notification/dtos/update-notification.input';
+import { Notifications, NotificationToken } from 'src/entities';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Role) private roleRepository: Repository<Role>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async create(createUserInput: CreateUserInput): Promise<User> {
@@ -58,9 +62,50 @@ export class UserService {
     }
     Object.assign(user, updateUserInput);
     const userUpdated = await this.usersRepository.save(user);
-    // console.log(userUpdated);
+    if (userUpdated) {
+      // send push notification
+      await this.notificationService
+        .sendPush(
+          userUpdated,
+          'Profile update',
+          'Your Profile have been updated successfully',
+        )
+        .catch((e) => {
+          console.log('Error sending push notification', e);
+        });
+    }
     return userUpdated;
   }
+
+  enablePush = async (
+    user_id: number,
+    createNotificationInput: CreateNotificationInput,
+  ): Promise<NotificationToken> => {
+    const user = await this.usersRepository.findOne({
+      where: { id: user_id },
+    });
+    return await this.notificationService.acceptPushNotification(
+      user,
+      createNotificationInput,
+    );
+  };
+
+  disablePush = async (
+    user_id: number,
+    updateNotificationInput: UpdateNotificationInput,
+  ) => {
+    const user = await this.usersRepository.findOne({
+      where: { id: user_id },
+    });
+    return await this.notificationService.disablePushNotification(
+      user,
+      updateNotificationInput,
+    );
+  };
+
+  getPushNotifications = async (): Promise<Notifications[]> => {
+    return await this.notificationService.getNotifications();
+  };
 
   async remove(id: number): Promise<User> {
     const user = await this.findOne(id);
