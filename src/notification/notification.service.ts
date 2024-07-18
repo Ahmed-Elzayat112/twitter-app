@@ -100,6 +100,7 @@ export class NotificationService {
         title,
         body,
       });
+
       return savedNotification;
     } else {
       throw new Error('No active push notification token found');

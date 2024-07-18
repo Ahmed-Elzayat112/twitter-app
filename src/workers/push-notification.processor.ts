@@ -8,11 +8,13 @@ export class PushNotificationProcessor extends WorkerHost {
     const { token, title, body } = job.data;
     console.log(`Push notification`);
     try {
-      await firebase.messaging().send({
+      const message = await firebase.messaging().send({
         notification: { title, body },
         token,
         android: { priority: 'high' },
       });
+
+      console.log(message);
     } catch (error) {
       console.error('Error sending push notification:', error);
     }

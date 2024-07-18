@@ -25,6 +25,7 @@ import { MailProcessor } from './workers/mail.processor';
 import { RoleModule } from './role/role.module';
 import { GraphqlConfigService } from './configs/graphql.config';
 import { NotificationModule } from './notification/notification.module';
+import { PushNotificationProcessor } from './workers/push-notification.processor';
 
 @Module({
   imports: [
@@ -96,6 +97,7 @@ import { NotificationModule } from './notification/notification.module';
     },
     AppService,
     MailProcessor,
+    PushNotificationProcessor,
   ],
 })
 export class AppModule {}
